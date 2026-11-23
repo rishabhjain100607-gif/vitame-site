@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="./">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Courier | VITAME</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#1a1410" />
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEXUlEQVR42u1bPW8TSRh+ZmY3ibNZe/0VQyDcNZQUV9EABboC6XRId1DwISSoEB0IKqT7AVddcX8BiYZ/cFdeQ41EQYEIJLmQ2MF2cGzH8QzF7mzs4I9ZM3HGXl4pzWhm18/zvvO87zuzIYhgSzlPYAJsvVgmqnPJtIAelQw6zeBVMJBpBa4aDTQu4Ptho3EB3w8jRcyNxsn7vbDSuIE/TELst4Cl60EPn97CbzcuA4SA0t61B29zgBC8ePYv/v7zOSgl4NwPPsooeJvj5r0ruP/oOkgw1rWeC1BK8PK/V3hy/y89GqAr/K/d/hmU0b7gAYBQn5xfr1+Cm3TAuQAhwXzhg/vl94tgrHdgymefv3BO2zbQtgUajT3luZxzMOvg1YT4kTDvJOBl3JAsHe9SzgLfasXNcuDI/gFFCIEQAnOJWWSyyWDM/wOATC6JZMoJ5x42+Wz5LqMIGBT63SAAxii8TBKHGcgtpsNo0PGusRKgatKLuUUvbEYknOUfCkOj6MgKoXGbm3S+GiuczCj28AZGQFSvnVjKfjV26kxBaW2bc/MIYIxFOoGRBIggv3eO9RJAABDBvNWVj+YR8Gm7Goqcis3M2iEhQgjYtoVUekEtAtpt8wgoydQ0jIHAu+lsMkyLAOC4CXhpt3PKwHQ6sVtAWsrr9nYml8K8MwchhFaA4xNBqMW+xJbyFuCl3XD/54MaQPDhz1l5+795BERNTTMzdqgDALD8YyEUxWHWbLbMI0BVmGSlZ9kM+UJ6YFrs28JazDwC3kUMS0IIbNvqKILUCdip1gyMgH311CSV/+TpXDiWzae66oRBArL2ftNADRhBuRPzc2FNkMunoZQDgb7nBRNVCgPAqeW8XxNkkkhnXVX8htYBIwiTs5DwU2DBw+zcjHINsN8ysBLc2thWDmE5Q2pAYSmnfA7A2xxrHwzUgFKxEnmNbft1wPKZxUjruMbzAm0ERMrNQZTI/j8V9ADHYccigp3lsOMmDtpgxcWUTPCR2GHhdN35g4pQAVhrr4VGvTnZdYBsgyklOPfTWWTz3lD8MsKqlRqKWxVtBGi7GYqamiRhj/+4A8dNKJNIBtw8HWsErL7fBG/zyD9Oglf+wZSYWQipngeMKp5y2m6tgVZrfzpEMJJ2BAxsl6rYM/E8YGx5m+o9LtNHwJhuc3TfGmm8G6QDb3S11Q6MmUlApfwZtc/1I/GSL7K+6bwZ1krATnUX9d3mkUdApbxjJgGM0bGc51uWZSYB47rS1tkHTGQaXNV4IDqRBOjeZlq7wXFogLF1QL3eRGmrfOQ1UefXZUa1w7zN0WjsQQgR/On3POcC1XLNTAIAwLYtEELAmP6tIM8cN9ZLep+7XiwTXV+Lvnj2D+4+uApCqdamRd4XbKwV8eb1SteHFd9i68Wyr1px/FpcEvD9HyYkE3H0flcajBMJnVi/b4F+zMTB+z0jYJpJ6IVtINhpSY+DnEpHXTgN4IdGwKRGRBTHfQEBVYbCDUreaQAAAABJRU5ErkJggg==" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <script src="./assets/config.js"></script>
+  <style>
+    :root{--bg:#ff8c2e;--ink:#1a1410;--cream:#fff7eb;--tangerine:#ff8a2a;--lemon:#ffdc52;--beet:#e03442;--leaf:#4aae4d;
+      --font-display:'Anton','Impact',sans-serif;--font-text:'Inter',system-ui,sans-serif;--font-price:'Space Grotesk','Inter',sans-serif;--hard:5px 5px 0 var(--ink)}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{font-family:var(--font-text);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh}
+    button,input{font:inherit;color:inherit}
+    a{color:inherit}
+    [hidden]{display:none!important}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px clamp(14px,4vw,40px)}
+    .logo{display:inline-flex;align-items:center;gap:10px;font:400 1.6rem var(--font-display);letter-spacing:.02em;text-decoration:none}
+    .logo b{font-weight:400;color:var(--cream)}
+    .logo-mark{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);background:radial-gradient(circle,var(--ink) 0 3px,transparent 4px),conic-gradient(var(--cream) 0 12.5%,var(--ink) 0 25%,var(--cream) 0 37.5%,var(--ink) 0 50%,var(--cream) 0 62.5%,var(--ink) 0 75%,var(--cream) 0 87.5%,var(--ink) 0)}
+    .tag{font:700 .7rem var(--font-price);letter-spacing:.14em;text-transform:uppercase;background:var(--ink);color:var(--cream);border-radius:999px;padding:.45em .9em}
+    main{max-width:760px;margin:0 auto;padding:4px clamp(14px,4vw,40px) 70px}
+    h1{font:400 clamp(2.8rem,10vw,5rem)/.92 var(--font-display);text-transform:uppercase;margin:8px 0 8px}
+    h1 em{font-style:normal;color:var(--cream)}
+    .lede{margin:0 0 22px;font-weight:500;max-width:30em}
+    .card{background:var(--cream);border:3px solid var(--ink);border-radius:26px;box-shadow:var(--hard);padding:clamp(16px,3vw,26px)}
+    .card+.card,.order+.order{margin-top:20px}
+    label{display:block;font-weight:700;font-size:.85rem;margin:0 0 6px}
+    .in{width:100%;height:52px;padding:0 16px;border-radius:14px;border:3px solid var(--ink);background:#fff;font-weight:600;outline:0;transition:box-shadow .2s}
+    .in:focus{box-shadow:4px 4px 0 var(--tangerine)}
+    .f{display:grid;gap:14px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;min-height:52px;padding:0 1.4em;border-radius:999px;border:3px solid var(--ink);background:var(--tangerine);color:var(--ink);font:700 1rem var(--font-text);cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .2s,box-shadow .2s;text-decoration:none}
+    .btn:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+    .btn:active:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn.ghost{background:var(--cream)}
+    .btn.green{background:var(--leaf);color:var(--cream)}
+    .btn.block{width:100%}
+    .msg{min-height:1.3em;margin:10px 0 0;font-weight:700;font-size:.9rem;color:var(--beet)}
+    .msg.ok{color:var(--leaf)}
+
+    .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+    .gps{display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--cream);border-radius:20px;padding:12px 16px;margin-bottom:20px;box-shadow:4px 4px 0 var(--cream)}
+    .gps i{width:14px;height:14px;border-radius:50%;background:#8a7f76;flex:none}
+    .gps.on i{background:var(--lemon);animation:blink 1.2s infinite}
+    .gps b{display:block;font:700 .95rem var(--font-price)}
+    .gps small{opacity:.75}
+    @keyframes blink{50%{opacity:.3}}
+    .st{display:inline-flex;align-items:center;gap:.5em;border:3px solid var(--ink);border-radius:999px;padding:.25em .8em;font:700 .7rem var(--font-price);letter-spacing:.1em;text-transform:uppercase;background:#fff}
+    .st.packed{background:var(--lemon)}
+    .st.out{background:var(--tangerine)}
+    .order-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .order-h b{font:700 1.2rem var(--font-price)}
+    .kv{display:grid;gap:10px;margin:0 0 14px}
+    .kv div{display:grid;gap:2px}
+    .kv dt{font:700 .66rem var(--font-price);letter-spacing:.14em;text-transform:uppercase;opacity:.6}
+    .kv dd{margin:0;font-weight:600}
+    .kv a{font-weight:700}
+    .dist{display:inline-flex;align-items:baseline;gap:.3em;font:400 2rem/1 var(--font-display);text-transform:uppercase}
+    .dist small{font:700 .8rem var(--font-price);text-transform:uppercase}
+    .acts{display:grid;gap:10px}
+    @media(min-width:520px){.acts{grid-template-columns:1fr 1fr}.acts .full{grid-column:1/-1}}
+    .empty{text-align:center;padding:30px 10px}
+    .empty h2{font:400 2rem/1 var(--font-display);text-transform:uppercase;margin:0 0 6px}
+      .logo-img{display:block;height:30px;width:auto;filter:none!important}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="./index.html"><img class="logo-img" src="./media/vitame-ink.webp" alt="Vitame" width="111" height="30"></a>
+    <span class="tag">Courier</span>
+  </header>
+
+  <main>
+    <!-- sign in -->
+    <section data-login>
+      <h1>Ready to <em>roll?</em></h1>
+      <p class="lede">Sign in with the courier PIN to see the orders waiting for pick up. Customers can follow your location while you deliver.</p>
+      <form class="card f" data-login-form novalidate>
+        <div><label for="cname">Your name</label><input class="in" id="cname" autocomplete="name" placeholder="Ravi"></div>
+        <div><label for="cpin">Courier PIN</label><input class="in" id="cpin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN"></div>
+        <button class="btn block" type="submit">Start shift</button>
+        <p class="msg" role="status" aria-live="polite" data-login-msg></p>
+      </form>
+    </section>
+
+    <!-- orders -->
+    <section data-work hidden>
+      <div class="bar">
+        <h1 style="margin:0;font-size:clamp(2.2rem,8vw,3.4rem)">Orders</h1>
+        <div><button class="btn ghost" type="button" data-refresh style="min-height:44px">Refresh</button> <button class="btn ghost" type="button" data-logout style="min-height:44px">Sign out</button></div>
+      </div>
+      <div class="gps" data-gps><i></i><div><b data-gps-t>Location sharing is off</b><small data-gps-s>It starts when you pick up an order.</small></div></div>
+      <div data-orders></div>
+      <p class="msg" role="status" aria-live="polite" data-work-msg></p>
+    </section>
+  </main>
+
+  <script>
+  (function(){
+    var EP=(window.PP||{}).ordersEndpoint;
+    var $=function(s,r){return (r||document).querySelector(s)};
+    var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+    var store={g:function(k){try{return sessionStorage.getItem(k)}catch(e){return null}},s:function(k,v){try{sessionStorage.setItem(k,v)}catch(e){}},d:function(k){try{sessionStorage.removeItem(k)}catch(e){}},
+      lg:function(k){try{return localStorage.getItem(k)}catch(e){return null}},ls:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+    var S={pin:store.g('pp-cpin')||'',name:store.lg('pp-cname')||'',orders:[],watch:null,pos:null,lastSent:0,wake:null,busy:false};
+
+    function call(body){
+      return fetch(EP,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json()});
+    }
+    var rad=function(d){return d*Math.PI/180};
+    function haversine(a,b){var R=6371000,dl=rad(b.lat-a.lat),dg=rad(b.lng-a.lng),x=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dg/2)*Math.sin(dg/2);return 2*R*Math.asin(Math.sqrt(x))}
+    function fmt(m){return m<1000?{n:Math.round(m/10)*10,u:'m'}:{n:(Math.round(m/100)/10).toFixed(1),u:'km'}}
+
+    /* ---------- sign in ---------- */
+    $('#cname').value=S.name;
+    $('[data-login-form]').addEventListener('submit',function(e){
+      e.preventDefault();
+      var pin=$('#cpin').value.trim(),name=$('#cname').value.trim(),m=$('[data-login-msg]');
+      m.className='msg';
+      if(!name){m.textContent='Please enter your name.';return}
+      if(!pin){m.textContent='Please enter the courier PIN.';return}
+      if(!EP){m.textContent='The orders service is not connected.';return}
+      m.textContent='Checking...';
+      call({action:'courier_orders',pin:pin}).then(function(j){
+        if(!j.ok){m.textContent=j.error||'Could not sign in.';return}
+        S.pin=pin;S.name=name;store.s('pp-cpin',pin);store.ls('pp-cname',name);
+        enter(j);
+      }).catch(function(){m.textContent='Could not reach the server. Check your connection.'});
+    });
+    function enter(j){
+      $('[data-login]').hidden=true;$('[data-work]').hidden=false;
+      apply(j);
+    }
+    $('[data-logout]').addEventListener('click',function(){stopWatch();store.d('pp-cpin');S.pin='';S.orders=[];$('[data-work]').hidden=true;$('[data-login]').hidden=false;$('#cpin').value=''});
+    $('[data-refresh]').addEventListener('click',refresh);
+
+    /* ---------- orders ---------- */
+    function apply(j){
+      S.orders=j.orders||[];
+      render();
+      var out=S.orders.some(function(o){return o.status==='Out for delivery'});
+      if(out)startWatch();else stopWatch();
+    }
+    function refresh(){
+      if(!S.pin||S.busy)return;
+      S.busy=true;
+      return call({action:'courier_orders',pin:S.pin}).then(function(j){
+        if(j.ok)apply(j);else say(j.error||'Could not refresh.');
+      }).catch(function(){say('Could not reach the server.')}).then(function(){S.busy=false});
+    }
+    function say(t,ok){var m=$('[data-work-msg]');m.className='msg'+(ok?' ok':'');m.textContent=t||''}
+
+    function render(){
+      var box=$('[data-orders]');
+      if(!S.orders.length){box.innerHTML='<div class="card empty"><h2>All clear</h2><p>No orders are waiting right now. Pull to refresh in a minute.</p></div>';return}
+      box.innerHTML=S.orders.map(function(o){
+        var out=o.status==='Out for delivery';
+        var d=(S.pos&&o.dest)?fmt(haversine(S.pos,o.dest)):null;
+        var nav=o.dest?'https://www.google.com/maps/dir/?api=1&destination='+o.dest.lat+','+o.dest.lng:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([o.address,o.city,o.pin].join(', '));
+        return '<article class="card order" data-id="'+esc(o.id)+'"><div class="order-h"><b>'+esc(o.id)+'</b><span class="st '+(out?'out':o.status==='Packed'?'packed':'')+'">'+esc(o.status)+'</span></div>'+
+          '<dl class="kv"><div><dt>Customer</dt><dd>'+esc(o.name)+' &middot; <a href="tel:+91'+esc(o.phone)+'">'+esc(o.phone)+'</a></dd></div>'+
+          '<div><dt>Deliver to</dt><dd>'+esc([o.address,o.city,o.pin].filter(Boolean).join(', '))+'</dd></div>'+
+          '<div><dt>Box</dt><dd>'+esc(o.items)+'</dd></div>'+
+          '<div><dt>Payment</dt><dd>'+(o.payStatus==='Paid'?'Paid online':'Payment pending: Rs '+esc(o.total))+'</dd></div>'+
+          (d?'<div><dt>Distance now</dt><dd><span class="dist">'+d.n+' <small>'+d.u+'</small></span></dd></div>':'')+'</dl>'+
+          '<div class="acts">'+
+          (out?'<button class="btn green full" type="button" data-act="Delivered">Mark delivered</button>':'<button class="btn full" type="button" data-act="Out for delivery">Pick up and start delivery</button>')+
+          '<a class="btn ghost" href="'+nav+'" target="_blank" rel="noopener">Open in Maps</a>'+
+          (o.status==='Placed'?'<button class="btn ghost" type="button" data-act="Packed">Mark packed</button>':'')+
+          '</div></article>';
+      }).join('');
+    }
+
+    $('[data-orders]').addEventListener('click',function(e){
+      var b=e.target.closest('[data-act]');if(!b)return;
+      var id=b.closest('.order').dataset.id,status=b.dataset.act;
+      if(status==='Delivered'&&!confirm('Mark '+id+' as delivered?'))return;
+      b.disabled=true;say('');
+      call({action:'courier_status',pin:S.pin,id:id,status:status,name:S.name}).then(function(j){
+        if(!j.ok){say(j.error||'Could not update the order.');b.disabled=false;return}
+        say(status==='Delivered'?id+' delivered. Nice work.':status==='Out for delivery'?id+' is on its way. Your location is now shared.':id+' marked packed.',true);
+        var o=S.orders.filter(function(x){return x.id===id})[0];
+        if(o)o.status=status;
+        if(status==='Delivered')S.orders=S.orders.filter(function(x){return x.id!==id});
+        render();
+        var anyOut=S.orders.some(function(x){return x.status==='Out for delivery'});
+        if(anyOut){startWatch();sendNow(true)}else stopWatch();
+      }).catch(function(){say('Could not reach the server.');b.disabled=false});
+    });
+
+    /* ---------- location sharing ---------- */
+    function gps(on,t,s){var g=$('[data-gps]');g.classList.toggle('on',!!on);$('[data-gps-t]').textContent=t;$('[data-gps-s]').textContent=s||''}
+    function startWatch(){
+      if(S.watch!=null)return;
+      if(!navigator.geolocation){gps(false,'This device cannot share location','Use a phone with GPS.');return}
+      gps(false,'Finding your location','Allow location access when asked.');
+      S.watch=navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:3000,timeout:20000});
+      if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(w){S.wake=w}).catch(function(){})}
+    }
+    function stopWatch(){
+      if(S.watch!=null){navigator.geolocation.clearWatch(S.watch);S.watch=null}
+      if(S.wake){try{S.wake.release()}catch(e){}S.wake=null}
+      gps(false,'Location sharing is off','It starts when you pick up an order.');
+    }
+    function onPos(p){
+      S.pos={lat:p.coords.latitude,lng:p.coords.longitude,acc:Math.round(p.coords.accuracy||0),ts:Date.now()};
+      gps(true,'Sharing your location','Accuracy about '+S.pos.acc+' m. Customers see the order moving.');
+      sendNow(false);render();
+    }
+    function onErr(err){
+      var denied=err&&err.code===1;
+      gps(false,denied?'Location is blocked':'Cannot find your location',denied?'Allow location for this page in your browser settings, then reload.':'Move to a spot with a clearer sky. Still trying.');
+    }
+    function sendNow(force){
+      if(!S.pos||!S.pin)return;
+      var now=Date.now();
+      if(!force&&now-S.lastSent<6000)return;
+      S.lastSent=now;
+      S.orders.filter(function(o){return o.status==='Out for delivery'}).forEach(function(o){
+        call({action:'courier_update',pin:S.pin,id:o.id,lat:S.pos.lat,lng:S.pos.lng,name:S.name}).then(function(j){
+          if(j&&!j.ok&&/already/i.test(j.error||''))refresh();
+        }).catch(function(){});
+      });
+    }
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&S.watch!=null&&navigator.wakeLock&&!S.wake){navigator.wakeLock.request('screen').then(function(w){S.wake=w}).catch(function(){})}});
+    setInterval(function(){if(S.pin&&!document.hidden)refresh()},30000);
+    // heartbeat: send the latest position every few seconds even when it has not changed, so customers see it is live
+    setInterval(function(){if(S.watch!=null&&S.pos)sendNow(true)},7000);
+
+    // resume a shift after a reload
+    if(S.pin&&EP){call({action:'courier_orders',pin:S.pin}).then(function(j){if(j.ok)enter(j);else{store.d('pp-cpin');S.pin=''}}).catch(function(){})}
+  })();
+  </script>
+</body>
+</html>

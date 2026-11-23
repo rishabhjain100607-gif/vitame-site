@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin | VITAME</title>
+  <meta name="theme-color" content="#1a1410" />
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEXUlEQVR42u1bPW8TSRh+ZmY3ibNZe/0VQyDcNZQUV9EABboC6XRId1DwISSoEB0IKqT7AVddcX8BiYZ/cFdeQ41EQYEIJLmQ2MF2cGzH8QzF7mzs4I9ZM3HGXl4pzWhm18/zvvO87zuzIYhgSzlPYAJsvVgmqnPJtIAelQw6zeBVMJBpBa4aDTQu4Ptho3EB3w8jRcyNxsn7vbDSuIE/TELst4Cl60EPn97CbzcuA4SA0t61B29zgBC8ePYv/v7zOSgl4NwPPsooeJvj5r0ruP/oOkgw1rWeC1BK8PK/V3hy/y89GqAr/K/d/hmU0b7gAYBQn5xfr1+Cm3TAuQAhwXzhg/vl94tgrHdgymefv3BO2zbQtgUajT3luZxzMOvg1YT4kTDvJOBl3JAsHe9SzgLfasXNcuDI/gFFCIEQAnOJWWSyyWDM/wOATC6JZMoJ5x42+Wz5LqMIGBT63SAAxii8TBKHGcgtpsNo0PGusRKgatKLuUUvbEYknOUfCkOj6MgKoXGbm3S+GiuczCj28AZGQFSvnVjKfjV26kxBaW2bc/MIYIxFOoGRBIggv3eO9RJAABDBvNWVj+YR8Gm7Goqcis3M2iEhQgjYtoVUekEtAtpt8wgoydQ0jIHAu+lsMkyLAOC4CXhpt3PKwHQ6sVtAWsrr9nYml8K8MwchhFaA4xNBqMW+xJbyFuCl3XD/54MaQPDhz1l5+795BERNTTMzdqgDALD8YyEUxWHWbLbMI0BVmGSlZ9kM+UJ6YFrs28JazDwC3kUMS0IIbNvqKILUCdip1gyMgH311CSV/+TpXDiWzae66oRBArL2ftNADRhBuRPzc2FNkMunoZQDgb7nBRNVCgPAqeW8XxNkkkhnXVX8htYBIwiTs5DwU2DBw+zcjHINsN8ysBLc2thWDmE5Q2pAYSmnfA7A2xxrHwzUgFKxEnmNbft1wPKZxUjruMbzAm0ERMrNQZTI/j8V9ADHYccigp3lsOMmDtpgxcWUTPCR2GHhdN35g4pQAVhrr4VGvTnZdYBsgyklOPfTWWTz3lD8MsKqlRqKWxVtBGi7GYqamiRhj/+4A8dNKJNIBtw8HWsErL7fBG/zyD9Oglf+wZSYWQipngeMKp5y2m6tgVZrfzpEMJJ2BAxsl6rYM/E8YGx5m+o9LtNHwJhuc3TfGmm8G6QDb3S11Q6MmUlApfwZtc/1I/GSL7K+6bwZ1krATnUX9d3mkUdApbxjJgGM0bGc51uWZSYB47rS1tkHTGQaXNV4IDqRBOjeZlq7wXFogLF1QL3eRGmrfOQ1UefXZUa1w7zN0WjsQQgR/On3POcC1XLNTAIAwLYtEELAmP6tIM8cN9ZLep+7XiwTXV+Lvnj2D+4+uApCqdamRd4XbKwV8eb1SteHFd9i68Wyr1px/FpcEvD9HyYkE3H0flcajBMJnVi/b4F+zMTB+z0jYJpJ6IVtINhpSY+DnEpHXTgN4IdGwKRGRBTHfQEBVYbCDUreaQAAAABJRU5ErkJggg==" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/admin.css" />
+  <script src="./assets/config.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side" aria-label="Admin navigation">
+      <a class="logo" href="./admin.html" aria-label="Vitame admin"><img src="./media/vitame-cream.webp" alt="Vitame" width="111" height="30"></a>
+      <div class="tag">Admin portal</div>
+      <nav class="nav" id="nav"></nav>
+      <div class="sp"></div>
+      <div class="who" id="who"></div>
+    </aside>
+    <main class="main">
+      <header class="top">
+        <div><h1 id="ttl">Over<em>view</em></h1><p id="sub"></p></div>
+        <span class="sp"></span>
+        <div class="ctrls">
+          <span id="rc"></span>
+          <span class="pill" id="live" role="status"><i></i><span>Live</span></span>
+          <span class="sub" id="sync" style="margin:0;font-size:.76rem;color:var(--mut)"></span>
+          <button class="ib" type="button" id="snd2" aria-pressed="true" title="Sound on/off" aria-label="Toggle order sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg></button>
+          <button class="ib" type="button" id="rf" title="Refresh now" aria-label="Refresh now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.700M21 4v5h-5"/></svg></button>
+        </div>
+      </header>
+      <div class="err" id="errbar" hidden></div>
+      <div id="view"></div>
+    </main>
+  </div>
+  <div id="veil"></div>
+  <aside id="drawer" aria-hidden="true" aria-label="Order details"></aside>
+  <div id="toasts" aria-live="polite"></div>
+  <div id="tip" role="tooltip"></div>
+  <script src="./assets/admin.js"></script>
+  <script src="./assets/admin-pip.js"></script>
+</body>
+</html>

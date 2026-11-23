@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="./">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Login or Sign up | VITAME</title>
+  <meta name="description" content="Create your Vitame account or log in to join the crew." />
+  <meta name="theme-color" content="#ff8c2e" />
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEXUlEQVR42u1bPW8TSRh+ZmY3ibNZe/0VQyDcNZQUV9EABboC6XRId1DwISSoEB0IKqT7AVddcX8BiYZ/cFdeQ41EQYEIJLmQ2MF2cGzH8QzF7mzs4I9ZM3HGXl4pzWhm18/zvvO87zuzIYhgSzlPYAJsvVgmqnPJtIAelQw6zeBVMJBpBa4aDTQu4Ptho3EB3w8jRcyNxsn7vbDSuIE/TELst4Cl60EPn97CbzcuA4SA0t61B29zgBC8ePYv/v7zOSgl4NwPPsooeJvj5r0ruP/oOkgw1rWeC1BK8PK/V3hy/y89GqAr/K/d/hmU0b7gAYBQn5xfr1+Cm3TAuQAhwXzhg/vl94tgrHdgymefv3BO2zbQtgUajT3luZxzMOvg1YT4kTDvJOBl3JAsHe9SzgLfasXNcuDI/gFFCIEQAnOJWWSyyWDM/wOATC6JZMoJ5x42+Wz5LqMIGBT63SAAxii8TBKHGcgtpsNo0PGusRKgatKLuUUvbEYknOUfCkOj6MgKoXGbm3S+GiuczCj28AZGQFSvnVjKfjV26kxBaW2bc/MIYIxFOoGRBIggv3eO9RJAABDBvNWVj+YR8Gm7Goqcis3M2iEhQgjYtoVUekEtAtpt8wgoydQ0jIHAu+lsMkyLAOC4CXhpt3PKwHQ6sVtAWsrr9nYml8K8MwchhFaA4xNBqMW+xJbyFuCl3XD/54MaQPDhz1l5+795BERNTTMzdqgDALD8YyEUxWHWbLbMI0BVmGSlZ9kM+UJ6YFrs28JazDwC3kUMS0IIbNvqKILUCdip1gyMgH311CSV/+TpXDiWzae66oRBArL2ftNADRhBuRPzc2FNkMunoZQDgb7nBRNVCgPAqeW8XxNkkkhnXVX8htYBIwiTs5DwU2DBw+zcjHINsN8ysBLc2thWDmE5Q2pAYSmnfA7A2xxrHwzUgFKxEnmNbft1wPKZxUjruMbzAm0ERMrNQZTI/j8V9ADHYccigp3lsOMmDtpgxcWUTPCR2GHhdN35g4pQAVhrr4VGvTnZdYBsgyklOPfTWWTz3lD8MsKqlRqKWxVtBGi7GYqamiRhj/+4A8dNKJNIBtw8HWsErL7fBG/zyD9Oglf+wZSYWQipngeMKp5y2m6tgVZrfzpEMJJ2BAxsl6rYM/E8YGx5m+o9LtNHwJhuc3TfGmm8G6QDb3S11Q6MmUlApfwZtc/1I/GSL7K+6bwZ1krATnUX9d3mkUdApbxjJgGM0bGc51uWZSYB47rS1tkHTGQaXNV4IDqRBOjeZlq7wXFogLF1QL3eRGmrfOQ1UefXZUa1w7zN0WjsQQgR/On3POcC1XLNTAIAwLYtEELAmP6tIM8cN9ZLep+7XiwTXV+Lvnj2D+4+uApCqdamRd4XbKwV8eb1SteHFd9i68Wyr1px/FpcEvD9HyYkE3H0flcajBMJnVi/b4F+zMTB+z0jYJpJ6IVtINhpSY+DnEpHXTgN4IdGwKRGRBTHfQEBVYbCDUreaQAAAABJRU5ErkJggg==" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <script src="./assets/config.js"></script>
+  <style>
+    :root{--bg:#ff8c2e;--ink:#1a1410;--cream:#fff7eb;--tangerine:#ff8a2a;--lemon:#ffdc52;--beet:#e03442;
+      --font-display:'Anton','Impact',sans-serif;--font-text:'Inter',system-ui,sans-serif;--font-price:'Space Grotesk','Inter',sans-serif;
+      --hard:5px 5px 0 var(--ink)}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{font-family:var(--font-text);background:var(--ink);color:var(--ink);-webkit-font-smoothing:antialiased}
+    button,input{font:inherit;color:inherit}
+    a{color:inherit}
+    .shell{display:flex;min-height:100vh;padding:10px;gap:10px;background:var(--ink)}
+    @media(min-width:1024px){.shell{height:100vh;padding:16px;gap:16px}}
+
+    /* left: hero panel */
+    .hero{position:relative;display:none;flex:0 0 52%;border-radius:28px;overflow:hidden;background:var(--bg);border:3px solid var(--cream);flex-direction:column;justify-content:flex-end;padding:0 clamp(32px,4vw,56px) clamp(36px,6vh,72px)}
+    @media(min-width:1024px){.hero{display:flex}}
+    .hero video,.hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% center}
+    .hero-in{position:relative;z-index:1;max-width:360px}
+    .logo{display:inline-flex;align-items:center;gap:10px;font:400 1.7rem var(--font-display);letter-spacing:.02em;text-decoration:none;color:var(--ink)}
+    .logo b{font-weight:400;color:var(--cream)}
+    .logo-mark{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,var(--ink) 0 3px,transparent 4px),conic-gradient(var(--cream) 0 12.5%,var(--ink) 0 25%,var(--cream) 0 37.5%,var(--ink) 0 50%,var(--cream) 0 62.5%,var(--ink) 0 75%,var(--cream) 0 87.5%,var(--ink) 0);border:2px solid var(--ink)}
+    .hero h1{font:400 clamp(3rem,5.2vw,5rem)/.95 var(--font-display);text-transform:uppercase;margin:22px 0 12px;color:var(--ink)}
+    .hero h1 em{font-style:normal;color:var(--cream)}
+    .hero p{margin:0 0 22px;font-weight:500;line-height:1.5;color:var(--ink);max-width:26em}
+    .steps{display:grid;gap:10px}
+    .step{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:18px;border:3px solid var(--ink);background:var(--cream);box-shadow:4px 4px 0 var(--ink);font-weight:600;font-size:.95rem}
+    .step i{font:700 .9rem var(--font-price);font-style:normal;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--cream);flex:none}
+    .step.on{background:var(--lemon)}
+
+    /* right: form */
+    .panel{flex:1;display:flex;align-items:center;justify-content:center;background:var(--cream);border-radius:28px;padding:36px clamp(18px,5vw,64px);overflow-y:auto}
+    .card{width:100%;max-width:480px}
+    .m-logo{display:flex;margin-bottom:22px}
+    @media(min-width:1024px){.m-logo{display:none}}
+    .m-logo .logo{color:var(--ink)}
+    .m-logo .logo b{color:var(--tangerine)}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border:3px solid var(--ink);border-radius:999px;background:#fff;margin-bottom:26px}
+    .tab{border:0;background:transparent;border-radius:999px;padding:.7em 1em;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
+    .tab[aria-selected=true]{background:var(--ink);color:var(--cream)}
+    h2{font:400 clamp(2.2rem,4vw,3rem)/1 var(--font-display);text-transform:uppercase;margin:0 0 8px}
+    .sub{margin:0 0 22px;opacity:.7;font-size:.95rem}
+    form{display:grid;gap:14px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:420px){.row{grid-template-columns:1fr}}
+    label{display:block;font-weight:700;font-size:.85rem;margin-bottom:6px}
+    .field input{width:100%;height:48px;padding:0 16px;border-radius:14px;border:3px solid var(--ink);background:#fff;font-weight:500;outline:0;transition:box-shadow .2s,border-color .2s}
+    .field input::placeholder{color:#1a141066}
+    .field input:focus{box-shadow:4px 4px 0 var(--tangerine)}
+    .field input[aria-invalid=true]{border-color:var(--beet)}
+    .pw{position:relative}
+    .pw input{padding-right:70px}
+    .pw button{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:transparent;font-weight:700;font-size:.8rem;cursor:pointer;opacity:.65}
+    .pw button:hover{opacity:1}
+    .hint{font-size:.78rem;opacity:.6;margin:6px 0 0}
+    .go{margin-top:6px;height:56px;border-radius:999px;border:3px solid var(--ink);background:var(--tangerine);color:var(--ink);font:700 1rem var(--font-text);cursor:pointer;box-shadow:var(--hard);transition:transform .2s,box-shadow .2s}
+    .go:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+    .go:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+    .msg{min-height:1.3em;margin:0;font-weight:600;font-size:.88rem;color:var(--beet)}
+    .msg.ok{color:#2c7a30}
+    .alt{text-align:center;font-size:.9rem;margin:22px 0 0;opacity:.8}
+    .alt button{border:0;background:none;font-weight:700;text-decoration:underline;text-underline-offset:4px;cursor:pointer;padding:0}
+    .alt button:hover{color:var(--tangerine)}
+    .gwrap{display:flex;justify-content:center;min-height:48px}
+    .gbtn{width:100%;height:48px;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;border:3px solid var(--ink);background:#fff;font-weight:700;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .2s,box-shadow .2s}
+    .gbtn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+    .gbtn svg{width:20px;height:20px}
+    .or{display:flex;align-items:center;gap:14px;font:700 .72rem var(--font-price);letter-spacing:.16em;text-transform:uppercase;opacity:.55}
+    .or:before,.or:after{content:"";flex:1;border-top:2px solid var(--ink);opacity:.25}
+    /* email verification step */
+    .vmark{width:64px;height:64px;border-radius:50%;background:var(--lemon);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);display:grid;place-items:center;margin-bottom:18px}
+    .vmark svg{width:30px;height:30px}
+    .otp{display:flex;gap:12px;margin:6px 0 4px}
+    .otp input{width:100%;max-width:76px;height:84px;text-align:center;font:400 2.6rem var(--font-display);border-radius:18px;border:3px solid var(--ink);background:#fff;outline:0;padding:0;transition:box-shadow .2s,background .2s,border-color .2s;caret-color:var(--tangerine)}
+    .otp input:focus{box-shadow:4px 4px 0 var(--tangerine)}
+    .otp input.has{background:var(--lemon)}
+    .otp.bad input{border-color:var(--beet);animation:shake .4s}
+    @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    @media(prefers-reduced-motion:reduce){.otp.bad input{animation:none}}
+    .vtime{font:700 .8rem var(--font-price);letter-spacing:.06em;opacity:.65;margin:8px 0 0}
+    .alt button[disabled]{opacity:.5;cursor:default;text-decoration:none}
+    .go[disabled]{opacity:.6;cursor:default;transform:none}
+    .alt .dot{margin:0 8px;opacity:.4}
+    [hidden]{display:none!important}
+    video,img{filter:saturate(1.12) brightness(1.05)}
+      .logo-img{display:block;height:30px;width:auto;filter:none!important}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero" aria-hidden="true">
+      <video autoplay muted loop playsinline poster="./media/hero.poster.jpg"><source src="./media/hero.mp4" type="video/mp4"></video>
+      <div class="hero-in">
+        <a class="logo" href="./index.html" tabindex="-1"><img class="logo-img" src="./media/vitame-ink.webp" alt="Vitame" width="111" height="30"></a>
+        <h1>Join the <em>crew</em></h1>
+        <p>Four quick steps to loud, cold-pressed flavour at your door.</p>
+        <div class="steps">
+          <div class="step on"><i>1</i>Register your details</div>
+          <div class="step" data-vstep><i>2</i>Verify your email</div>
+          <div class="step"><i>3</i>Pick your flavours</div>
+          <div class="step"><i>4</i>Get it delivered cold</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="card">
+        <div class="m-logo"><a class="logo" href="./index.html"><img class="logo-img" src="./media/vitame-ink.webp" alt="Vitame" width="111" height="30"></a></div>
+        <div class="tabs" role="tablist" aria-label="Account">
+          <button class="tab" role="tab" id="tab-signup" aria-selected="true" aria-controls="form-signup" type="button">Sign up</button>
+          <button class="tab" role="tab" id="tab-login" aria-selected="false" aria-controls="form-login" type="button">Log in</button>
+        </div>
+
+        <div id="gate-note" class="sub" hidden></div>
+
+        <section id="verify" hidden aria-labelledby="v-title">
+          <div class="vmark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#1a1410" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg></div>
+          <h2 id="v-title">Check your inbox</h2>
+          <p class="sub">We sent a 4 digit code to <b id="v-email"></b>. Enter it below to <span id="v-what">continue</span>.</p>
+          <div class="otp" id="otp" role="group" aria-label="4 digit code">
+            <input inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1">
+            <input inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 2">
+            <input inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 3">
+            <input inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit 4">
+          </div>
+          <p class="vtime" id="v-time"></p>
+          <p class="msg" role="status" aria-live="polite"></p>
+          <button class="go" id="v-go" type="button" style="width:100%">Verify and continue</button>
+          <p class="alt" style="margin-top:18px"><button type="button" id="v-resend">Resend code</button><span class="dot">&middot;</span><button type="button" id="v-back">Use a different email</button></p>
+          <p class="hint" style="text-align:center;margin-top:14px">Nothing in your inbox? Check your spam folder. The code works for 10 minutes.</p>
+        </section>
+
+        <form id="form-signup" role="tabpanel" aria-labelledby="tab-signup" novalidate>
+          <div><h2>Create your profile</h2><p class="sub">Sign up first, then step inside.</p></div>
+          <div class="gwrap" data-google></div>
+          <div class="or"><span>Or</span></div>
+          <div class="row">
+            <div class="field"><label for="su-first">First name</label><input id="su-first" name="first" type="text" placeholder="Jane" autocomplete="given-name"></div>
+            <div class="field"><label for="su-last">Last name</label><input id="su-last" name="last" type="text" placeholder="Doe" autocomplete="family-name"></div>
+          </div>
+          <div class="field"><label for="su-email">Email</label><input id="su-email" name="email" type="email" inputmode="email" placeholder="you@email.com" autocomplete="email"></div>
+          <div class="field"><label for="su-pass">Password</label>
+            <div class="pw"><input id="su-pass" name="password" type="password" placeholder="••••••••" autocomplete="new-password"><button type="button" data-toggle="su-pass" aria-label="Show password">Show</button></div>
+            <p class="hint">Requires at least 8 characters.</p></div>
+          <p class="msg" role="status" aria-live="polite"></p>
+          <button class="go" type="submit">Create account</button>
+          <p class="alt" style="margin-top:8px">Already a member? <button type="button" data-switch="login">Log in</button></p>
+        </form>
+
+        <form id="form-login" role="tabpanel" aria-labelledby="tab-login" novalidate hidden>
+          <div><h2>Welcome back</h2><p class="sub">Log in to keep the juice flowing.</p></div>
+          <div class="gwrap" data-google></div>
+          <div class="or"><span>Or</span></div>
+          <div class="field"><label for="li-email">Email</label><input id="li-email" name="email" type="email" inputmode="email" placeholder="you@email.com" autocomplete="email"></div>
+          <div class="field"><label for="li-pass">Password</label>
+            <div class="pw"><input id="li-pass" name="password" type="password" placeholder="••••••••" autocomplete="current-password"><button type="button" data-toggle="li-pass" aria-label="Show password">Show</button></div></div>
+          <p class="msg" role="status" aria-live="polite"></p>
+          <button class="go" type="submit">Log in</button>
+          <p class="alt" style="margin-top:8px">New here? <button type="button" data-switch="signup">Create an account</button></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (function(){
+    var $=function(s,r){return (r||document).querySelector(s)};
+    var store={
+      get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},
+      set:function(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}},
+      del:function(k){try{localStorage.removeItem(k)}catch(e){}}
+    };
+    var params=new URLSearchParams(location.search);
+    function safeNext(){var n=params.get('next')||'index.html';return /^[\w\-.]+\.html([?#].*)?$/.test(n)?n:'index.html'}
+    function go(){var n=safeNext();if(n==='admin.html')n='index.html';location.replace('./'+n)}
+    function adminOpen(){try{var a=JSON.parse(sessionStorage.getItem('pp-admin')||'null');return !!(a&&a.token&&a.exp>Date.now())}catch(e){return false}}
+    function users(){try{return JSON.parse(store.get('pp-users')||'{}')}catch(e){return {}}}
+
+    var GOOGLE_CLIENT_ID=(window.PP&&window.PP.googleClientId)||''; // set in assets/config.js
+    if(params.get('logout')){store.del('pp-session');history.replaceState(null,'',location.pathname+'#signup');
+      var gn=$('#gate-note');gn.hidden=false;gn.textContent='You have been logged out. Sign up or log in again to continue.'}
+    else if(adminOpen()){location.replace('./admin.html');return}
+    else if(store.get('pp-session')&&safeNext()!=='admin.html'){go();return}
+    else if(params.get('next')){var g=$('#gate-note');g.hidden=false;g.textContent='Please sign up or log in to come in.'}
+
+    function hash(pw,salt){
+      var data=new TextEncoder().encode(salt+':'+pw);
+      if(window.crypto&&crypto.subtle)return crypto.subtle.digest('SHA-256',data).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')});
+      return Promise.resolve(btoa(unescape(encodeURIComponent(salt+':'+pw))));
+    }
+    function salt(){var a=new Uint8Array(12);(window.crypto||{getRandomValues:function(x){for(var i=0;i<x.length;i++)x[i]=Math.random()*256}}).getRandomValues(a);return Array.from(a).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
+
+    var tabs={signup:$('#tab-signup'),login:$('#tab-login')},forms={signup:$('#form-signup'),login:$('#form-login')};
+    function show(w){
+      Object.keys(tabs).forEach(function(k){tabs[k].setAttribute('aria-selected',String(k===w));forms[k].hidden=k!==w});
+      document.title=(w==='signup'?'Sign up':'Log in')+' | VITAME';
+      history.replaceState(null,'',location.pathname+location.search+'#'+w);
+    }
+    tabs.signup.onclick=function(){show('signup')};tabs.login.onclick=function(){show('login')};
+    document.querySelectorAll('[data-switch]').forEach(function(b){b.onclick=function(){show(b.dataset.switch)}});
+    document.querySelectorAll('[data-toggle]').forEach(function(b){b.onclick=function(){
+      var i=$('#'+b.dataset.toggle),p=i.type==='password';i.type=p?'text':'password';b.textContent=p?'Hide':'Show';b.setAttribute('aria-label',p?'Hide password':'Show password')}});
+    show(location.hash==='#login'&&!params.get('logout')?'login':'signup');
+
+    // ---- Google sign-in
+    var gIcon='<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
+    // Google hands the page a signed token. The shop server checks it with Google, so nobody can sign in as someone else's email.
+    function googleDone(resp){
+      var f=forms.signup.hidden?forms.login:forms.signup;
+      if(!EP)return fail(f,'Google sign-in needs the shop server, which is not connected.');
+      vsayGoogle(f,'Checking with Google...');
+      api({action:'google_verify',credential:resp&&resp.credential}).then(function(j){
+        if(j&&j.ok&&j.email)return done(f,j.given||j.name||j.email.split('@')[0],j.email,j.family||'');
+        var e=(j&&j.error)||'';
+        fail(f,/unknown action/i.test(e)?'Google sign-in is not switched on on the server yet.':(e||'Google sign-in failed. Please try again.'));
+      });
+    }
+    function vsayGoogle(f,t){var m=$('.msg',f);if(m){m.className='msg ok';m.textContent=t}}
+    function fallbackBtn(box){
+      box.innerHTML='<button type="button" class="gbtn">'+gIcon+'Continue with Google</button>';
+      box.firstChild.onclick=function(){var f=forms.signup.hidden?forms.login:forms.signup;
+        fail(f,'Google sign-in is not set up yet. Add your Google Client ID to enable it.')};
+    }
+    var boxes=document.querySelectorAll('[data-google]');
+    if(!GOOGLE_CLIENT_ID){boxes.forEach(fallbackBtn)}
+    else{
+      var sc=document.createElement('script');sc.src='https://accounts.google.com/gsi/client';sc.async=true;
+      sc.onload=function(){
+        google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:googleDone});
+        boxes.forEach(function(b){google.accounts.id.renderButton(b,{theme:'outline',size:'large',shape:'pill',text:'continue_with',width:400})});
+      };
+      sc.onerror=function(){boxes.forEach(fallbackBtn)};
+      document.head.appendChild(sc);
+    }
+
+    var re=/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/;
+    function fail(f,msg,names){f.querySelectorAll('input').forEach(function(i){i.removeAttribute('aria-invalid')});
+      (names||[]).forEach(function(n){var el=f.querySelector('[name="'+n+'"]');if(el)el.setAttribute('aria-invalid','true')});
+      var m=$('.msg',f);m.className='msg';m.textContent=msg;var first=f.querySelector('[aria-invalid]');if(first)first.focus()}
+    // every player gets a permanent ID (kept per email on this device) that the game leaderboard uses
+    function ppUid(email){
+      var map={};try{map=JSON.parse(store.get('pp-uids')||'{}')}catch(e){}
+      var k=String(email).toLowerCase();
+      if(!/^PPU-[A-HJ-NP-Z2-9]{8}$/.test(map[k]||'')){
+        var A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=new Uint8Array(8),id='PPU-';
+        (window.crypto||{getRandomValues:function(x){for(var i=0;i<x.length;i++)x[i]=Math.random()*256}}).getRandomValues(r);
+        for(var i=0;i<8;i++)id+=A[r[i]%A.length];
+        map[k]=id;store.set('pp-uids',JSON.stringify(map));
+      }
+      return map[k];
+    }
+    function nick(first,last){first=String(first||'').trim();last=String(last||'').trim();return (first+(last?' '+last[0].toUpperCase()+'.':'')).slice(0,20)||'Player'}
+    function done(f,name,email,last){var m=$('.msg',f);m.className='msg ok';m.textContent='You are in. Opening Vitame...';
+      store.set('pp-session',JSON.stringify({email:email,name:name,nick:nick(name,last),uid:ppUid(email)}));setTimeout(go,600)}
+
+    // ---- email verification: a 4 digit code sent to the address, before the account opens
+    var EP=(window.PP&&window.PP.ordersEndpoint)||'';
+    var V=$('#verify'),otpBox=$('#otp'),otpIn=Array.prototype.slice.call(otpBox.querySelectorAll('input')),vGo=$('#v-go'),vRe=$('#v-resend'),vMsg=$('.msg',V),vTime=$('#v-time');
+    var pending=null,tExp=0,tCool=0,expAt=0,coolAt=0,busy=false,wasHidden=null;
+    function api(body){
+      var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){ctl&&ctl.abort()},20000);
+      return fetch(EP,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),signal:ctl?ctl.signal:undefined})
+        .then(function(r){return r.json()}).then(function(j){clearTimeout(tm);return j},function(){clearTimeout(tm);return {ok:false,net:true,error:'Could not reach the server. Check your connection and try again.'}});
+    }
+    function friendly(j){var e=(j&&j.error)||'';if(j&&j.net)return e;if(!j||!j.otp)return 'Email verification is not switched on yet. The server replied: "'+String(e||'no message').slice(0,90)+'" (script version is out of date).';return e||'Something went wrong. Please try again.'}
+    function vsay(t,ok){vMsg.className='msg'+(ok?' ok':'');vMsg.textContent=t||''}
+    function code(){return otpIn.map(function(i){return i.value}).join('')}
+    function clearCode(bad){otpIn.forEach(function(i){i.value='';i.classList.remove('has')});otpBox.classList.toggle('bad',!!bad);otpIn[0].focus()}
+    function fmt(ms){var s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2)}
+    function tick(){
+      var now=Date.now(),left=expAt-now;
+      vTime.textContent=left>0?'Code expires in '+fmt(left):'This code has expired. Ask for a new one.';
+      var c=coolAt-now;
+      if(c>0){vRe.disabled=true;vRe.textContent='Resend in '+Math.ceil(c/1000)+'s'}else{vRe.disabled=false;vRe.textContent='Resend code'}
+      vGo.disabled=busy||left<=0;
+    }
+    function startTimers(ttl,cool){expAt=Date.now()+(ttl||600)*1000;coolAt=Date.now()+(cool||30)*1000;clearInterval(tExp);tExp=setInterval(tick,500);tick()}
+    function showVerify(){
+      wasHidden={tabs:$('.tabs').hidden,note:$('#gate-note').hidden};
+      $('.tabs').hidden=true;$('#gate-note').hidden=true;forms.signup.hidden=true;forms.login.hidden=true;V.hidden=false;
+      var st=document.querySelector('[data-vstep]');if(st){document.querySelectorAll('.step').forEach(function(x){x.classList.remove('on')});st.classList.add('on')}
+      document.title='Verify your email | VITAME';
+      try{history.pushState({v:1},'',location.pathname+location.search+'#verify')}catch(e){}
+    }
+    function hideVerify(){
+      clearInterval(tExp);V.hidden=true;$('.tabs').hidden=false;$('#gate-note').hidden=wasHidden?wasHidden.note:true;
+      var first=document.querySelector('.step');document.querySelectorAll('.step').forEach(function(x){x.classList.remove('on')});if(first)first.classList.add('on');
+      show(pending&&pending.purpose==='login'?'login':'signup');
+    }
+    window.addEventListener('popstate',function(){if(!V.hidden)hideVerify()});
+    $('#v-back').onclick=function(){if(history.state&&history.state.v)history.back();else hideVerify()};
+
+    function sendCode(){
+      busy=true;vGo.disabled=true;vRe.disabled=true;vsay('Sending your code...',true);
+      return api({action:'otp_send',email:pending.email,purpose:pending.purpose,name:pending.name}).then(function(j){
+        busy=false;
+        if(j&&j.ok){startTimers(j.ttl,j.cooldown);vsay('');return true}
+        if(j&&j.wait)startTimers(null,j.wait);else tick();
+        vsay(friendly(j));return false;
+      });
+    }
+    // called by sign-up and log-in once the form itself is valid
+    function begin(p,f,btn){
+      pending=p;var label=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='Sending your code...'}
+      busy=true;
+      api({action:'otp_send',email:p.email,purpose:p.purpose,name:p.name}).then(function(j){
+        busy=false;if(btn){btn.disabled=false;btn.textContent=label}
+        if(!(j&&j.ok)){if(!EP)return fail(f,'Email verification is not set up yet.');return fail(f,friendly(j))}
+        $('#v-email').textContent=p.email;$('#v-what').textContent=p.purpose==='login'?'log in':'finish creating your account';
+        showVerify();clearCode(false);vsay('');startTimers(j.ttl,j.cooldown);
+      });
+    }
+    function submitCode(){
+      var c=code();if(busy||c.length<4)return vsay('Enter all 4 digits.');
+      busy=true;vGo.disabled=true;vGo.textContent='Checking...';otpBox.classList.remove('bad');
+      api({action:'otp_verify',email:pending.email,code:c}).then(function(j){
+        busy=false;vGo.textContent='Verify and continue';
+        if(j&&j.ok){clearInterval(tExp);vGo.disabled=true;vsay('Verified. Opening Vitame...',true);pending.finish(V);return}
+        tick();vsay(friendly(j));clearCode(true);
+        if(j&&j.expired){expAt=0;tick();vRe.focus()}
+      });
+    }
+    vGo.onclick=submitCode;
+    vRe.onclick=function(){if(vRe.disabled||busy)return;clearCode(false);sendCode().then(function(ok){if(ok)vsay('A new code is on its way.',true)})};
+    otpIn.forEach(function(inp,i){
+      inp.addEventListener('input',function(){
+        var d=inp.value.replace(/\D/g,'');
+        if(d.length>1){ // pasted or auto-filled several digits
+          d.slice(0,4).split('').forEach(function(ch,k){if(otpIn[i+k]){otpIn[i+k].value=ch;otpIn[i+k].classList.add('has')}});
+          var n=Math.min(3,i+d.length);otpIn[n].focus();
+        }else{inp.value=d;inp.classList.toggle('has',!!d);if(d&&i<3)otpIn[i+1].focus()}
+        otpBox.classList.remove('bad');
+        if(code().length===4)submitCode();
+      });
+      inp.addEventListener('keydown',function(e){
+        if(e.key==='Backspace'&&!inp.value&&i>0){otpIn[i-1].value='';otpIn[i-1].classList.remove('has');otpIn[i-1].focus();e.preventDefault()}
+        else if(e.key==='ArrowLeft'&&i>0){otpIn[i-1].focus();e.preventDefault()}
+        else if(e.key==='ArrowRight'&&i<3){otpIn[i+1].focus();e.preventDefault()}
+        else if(e.key==='Enter'){submitCode()}
+      });
+      inp.addEventListener('focus',function(){inp.select()});
+    });
+
+    forms.signup.addEventListener('submit',function(e){e.preventDefault();var f=forms.signup,v=function(n){return f.elements[n].value.trim()},bad=[];
+      if(busy)return;
+      if(v('first').length<1)bad.push('first');if(v('last').length<1)bad.push('last');
+      if(!re.test(v('email')))bad.push('email');if(f.elements.password.value.length<8)bad.push('password');
+      if(bad.length){return fail(f,bad.indexOf('password')>-1&&bad.length===1?'Password needs at least 8 characters.':'Please check the highlighted fields.',bad)}
+      var email=v('email').toLowerCase(),u=users(),first=v('first'),last=v('last'),pw=f.elements.password.value,btn=$('.go',f);
+      if(u[email])return fail(f,'That email already has an account. Try logging in.',['email']);
+      var s=salt();hash(pw,s).then(function(h){
+        begin({purpose:'signup',email:email,name:first,finish:function(el){
+          // the account is only saved once the code is right
+          var u2=users();u2[email]={first:first,last:last,salt:s,hash:h};
+          if(!store.set('pp-users',JSON.stringify(u2))){vsay('Your browser is blocking storage, so the account cannot be saved.');return}
+          done(el,first,email,last)}},f,btn)})});
+
+    // ---- the shop owner: the email and password are checked on the server, which hands back a short-lived key for the admin portal
+    var ADMIN=String((window.PP&&window.PP.adminEmail)||'').trim().toLowerCase();
+    function adminLogin(f,email,pw){
+      var btn=$('.go',f),label=btn.textContent;btn.disabled=true;btn.textContent='Checking...';busy=true;
+      api({action:'admin_login',email:email,password:pw}).then(function(j){
+        busy=false;btn.disabled=false;btn.textContent=label;
+        if(!(j&&j.ok&&j.token)){var e=(j&&j.error)||'';if(/unknown action/i.test(e)||(j&&!j.net&&!e))return fail(f,'The admin service is not switched on yet. Paste the latest Code.gs into Apps Script and deploy a new version.',['email']);return fail(f,j&&j.net?e:e||'Wrong email or password.',[j&&j.net?'email':'password'])}
+        try{sessionStorage.setItem('pp-admin',JSON.stringify({token:j.token,exp:Date.now()+(j.ttl||21600)*1000-60000,email:j.email||email}))}catch(e){return fail(f,'Your browser is blocking storage, so the admin login cannot be kept.')}
+        store.set('pp-session',JSON.stringify({email:email,name:'Admin',nick:'Admin',uid:ppUid(email)}));
+        var m=$('.msg',f);m.className='msg ok';m.textContent='Welcome back. Opening the admin portal...';setTimeout(function(){location.replace('./admin.html')},500)})}
+    forms.login.addEventListener('submit',function(e){e.preventDefault();var f=forms.login,email=f.elements.email.value.trim().toLowerCase(),pw=f.elements.password.value;
+      if(busy)return;
+      if(!re.test(email)||!pw)return fail(f,'Enter your email and password.',[!re.test(email)?'email':'password']);
+      if(ADMIN&&email===ADMIN)return adminLogin(f,email,pw);
+      var rec=users()[email];if(!rec)return fail(f,'No account found for that email. Sign up first.',['email']);
+      hash(pw,rec.salt).then(function(h){if(h!==rec.hash)return fail(f,'Wrong password. Try again.',['password']);
+        begin({purpose:'login',email:email,name:rec.first,finish:function(el){done(el,rec.first,email,rec.last)}},f,$('.go',f))})});
+  })();
+  </script>
+</body>
+</html>

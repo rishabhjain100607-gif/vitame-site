@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>My subscriptions | VITAME</title>
+  <meta name="description" content="Skip, pause, swap flavours or cancel your Vitame subscription." />
+  <meta name="theme-color" content="#ff8c2e" />
+  <script src="./assets/config.js"></script>
+  <script type="module" crossorigin src="./assets/subs.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/shell-PN3sp6ph.js">
+  <link rel="stylesheet" crossorigin href="./assets/shell-VfJiyEuO.css">
+  <link rel="stylesheet" href="./assets/orders.css">
+  <link rel="stylesheet" href="./assets/subs.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <script src="./assets/stock.js" defer></script>
+  <link rel="stylesheet" href="./assets/pip.css">
+  <script src="./assets/pip.js" defer></script>
+</head>
+<body>
+  <main id="main">
+    <section class="sub-hero od-hero">
+      <div class="container">
+        <span class="chip" data-intro="eyebrow">My subscriptions</span>
+        <h1 data-hero-headline>Your <em>boxes</em></h1>
+        <p class="sub" data-intro="sub" data-lede>Skip a delivery, swap a flavour, change the rhythm, pause or cancel. All from here, no calls.</p>
+        <div class="sb-tabs" data-intro="cta">
+          <a class="sb-tab" href="#" data-auth data-go="./orders.html" data-plain>My orders</a>
+          <a class="sb-tab is-on" href="./subscriptions.html" aria-current="page">My subscriptions</a>
+          <a class="sb-tab" href="#" data-auth data-go="./subscribe.html" data-plain>Start a new one</a>
+        </div>
+        <div class="od-stats sb-stats" data-stats></div>
+      </div>
+    </section>
+
+    <section class="sec od-sec">
+      <div class="container">
+        <div class="sb-banner" data-banner hidden role="status"></div>
+        <div class="sb-list" data-list aria-live="polite"></div>
+        <div class="od-empty" data-empty hidden>
+          <div class="od-empty-art" aria-hidden="true"><img src="./media/box.webp" alt="" width="220" height="220"></div>
+          <h2 data-empty-title>No subscriptions yet</h2>
+          <p data-empty-text>Subscribe once and we send your box on repeat, 20% cheaper, with free delivery. You can skip or pause any time.</p>
+          <a class="pill solid" href="#" data-auth data-go="./subscribe.html" data-plain>Build my box</a>
+        </div>
+        <p class="sb-help" data-help hidden>Opened this page on another phone or computer? Use the <b>Manage my subscription</b> button in your email and it appears here.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

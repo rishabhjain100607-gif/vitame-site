@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="./">
+  <script>try{if(!localStorage.getItem("pp-session")){location.replace("./auth.html?next=orders.html")}}catch(e){}</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>My orders | VITAME</title>
+  <meta name="description" content="See every Vitame order you have placed and follow the one on its way to you." />
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ff8c2e" />
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEXUlEQVR42u1bPW8TSRh+ZmY3ibNZe/0VQyDcNZQUV9EABboC6XRId1DwISSoEB0IKqT7AVddcX8BiYZ/cFdeQ41EQYEIJLmQ2MF2cGzH8QzF7mzs4I9ZM3HGXl4pzWhm18/zvvO87zuzIYhgSzlPYAJsvVgmqnPJtIAelQw6zeBVMJBpBa4aDTQu4Ptho3EB3w8jRcyNxsn7vbDSuIE/TELst4Cl60EPn97CbzcuA4SA0t61B29zgBC8ePYv/v7zOSgl4NwPPsooeJvj5r0ruP/oOkgw1rWeC1BK8PK/V3hy/y89GqAr/K/d/hmU0b7gAYBQn5xfr1+Cm3TAuQAhwXzhg/vl94tgrHdgymefv3BO2zbQtgUajT3luZxzMOvg1YT4kTDvJOBl3JAsHe9SzgLfasXNcuDI/gFFCIEQAnOJWWSyyWDM/wOATC6JZMoJ5x42+Wz5LqMIGBT63SAAxii8TBKHGcgtpsNo0PGusRKgatKLuUUvbEYknOUfCkOj6MgKoXGbm3S+GiuczCj28AZGQFSvnVjKfjV26kxBaW2bc/MIYIxFOoGRBIggv3eO9RJAABDBvNWVj+YR8Gm7Goqcis3M2iEhQgjYtoVUekEtAtpt8wgoydQ0jIHAu+lsMkyLAOC4CXhpt3PKwHQ6sVtAWsrr9nYml8K8MwchhFaA4xNBqMW+xJbyFuCl3XD/54MaQPDhz1l5+795BERNTTMzdqgDALD8YyEUxWHWbLbMI0BVmGSlZ9kM+UJ6YFrs28JazDwC3kUMS0IIbNvqKILUCdip1gyMgH311CSV/+TpXDiWzae66oRBArL2ftNADRhBuRPzc2FNkMunoZQDgb7nBRNVCgPAqeW8XxNkkkhnXVX8htYBIwiTs5DwU2DBw+zcjHINsN8ysBLc2thWDmE5Q2pAYSmnfA7A2xxrHwzUgFKxEnmNbft1wPKZxUjruMbzAm0ERMrNQZTI/j8V9ADHYccigp3lsOMmDtpgxcWUTPCR2GHhdN35g4pQAVhrr4VGvTnZdYBsgyklOPfTWWTz3lD8MsKqlRqKWxVtBGi7GYqamiRhj/+4A8dNKJNIBtw8HWsErL7fBG/zyD9Oglf+wZSYWQipngeMKp5y2m6tgVZrfzpEMJJ2BAxsl6rYM/E8YGx5m+o9LtNHwJhuc3TfGmm8G6QDb3S11Q6MmUlApfwZtc/1I/GSL7K+6bwZ1krATnUX9d3mkUdApbxjJgGM0bGc51uWZSYB47rS1tkHTGQaXNV4IDqRBOjeZlq7wXFogLF1QL3eRGmrfOQ1UefXZUa1w7zN0WjsQQgR/On3POcC1XLNTAIAwLYtEELAmP6tIM8cN9ZLep+7XiwTXV+Lvnj2D+4+uApCqdamRd4XbKwV8eb1SteHFd9i68Wyr1px/FpcEvD9HyYkE3H0flcajBMJnVi/b4F+zMTB+z0jYJpJ6IVtINhpSY+DnEpHXTgN4IdGwKRGRBTHfQEBVYbCDUreaQAAAABJRU5ErkJggg==" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <script src="./assets/config.js"></script>
+  <script type="module" crossorigin src="./assets/orders.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/shell-PN3sp6ph.js">
+  <link rel="stylesheet" crossorigin href="./assets/shell-VfJiyEuO.css">
+  <link rel="stylesheet" href="./assets/orders.css">
+  <link rel="stylesheet" href="./assets/subs.css">
+  <script src="./assets/stock.js" defer></script>
+
+  <link rel="stylesheet" href="./assets/pip.css">
+  <script src="./assets/pip.js" defer></script>
+</head>
+<body>
+  <main id="main">
+    <!-- list view -->
+    <div data-view="list">
+      <section class="sub-hero od-hero">
+        <div class="container">
+          <span class="chip" data-intro="eyebrow">My orders</span>
+          <h1 data-hero-headline>Your <em>orders</em></h1>
+          <p class="sub" data-intro="sub" data-lede>Every order you have placed with us. Pick one to follow it home or see what was in the box.</p>
+          <div class="sb-tabs" data-intro="cta"><a class="sb-tab is-on" href="./orders.html" aria-current="page">My orders</a><a class="sb-tab" href="#" data-auth data-go="./subscriptions.html" data-plain>My subscriptions</a></div>
+          <div class="od-stats" data-intro="cta" data-stats></div>
+        </div>
+      </section>
+
+      <section class="sec od-sec">
+        <div class="container">
+          <div class="od-filters" role="tablist" aria-label="Filter orders" data-filters>
+            <button type="button" role="tab" class="od-f" data-f="all" aria-selected="true">All <b data-n="all">0</b></button>
+            <button type="button" role="tab" class="od-f" data-f="active" aria-selected="false">On the way <b data-n="active">0</b></button>
+            <button type="button" role="tab" class="od-f" data-f="done" aria-selected="false">Delivered <b data-n="done">0</b></button>
+          </div>
+          <div class="od-list" data-list aria-live="polite"></div>
+          <div class="od-empty" data-empty hidden>
+            <div class="od-empty-art" aria-hidden="true"><img src="./media/box.webp" alt="" width="220" height="220"></div>
+            <h2 data-empty-title>No orders yet</h2>
+            <p data-empty-text>When you place an order it shows up here, ready to track.</p>
+            <a class="pill solid" href="#" data-auth data-go="./shop.html" data-plain>Start shopping</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- one order: tracking or details -->
+    <div data-view="order" hidden>
+      <section class="sub-hero od-hero od-hero-sm">
+        <div class="container">
+          <a class="od-back" href="#" data-back><span aria-hidden="true">&larr;</span> All orders</a>
+          <div class="od-head">
+            <div>
+              <span class="chip" data-o-chip>Order</span>
+              <h1 data-o-title>PP-1000</h1>
+              <p class="sub" data-o-sub></p>
+            </div>
+            <span class="st" data-o-status></span>
+          </div>
+        </div>
+      </section>
+      <section class="sec od-sec">
+        <div class="container" data-o-body></div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,13 @@
+/* Runs on Vercel before the site is published. Fills assets/config.js from environment variables, so keys never live in the repository.
+   Set these in Vercel: Project > Settings > Environment Variables. Anything left empty keeps the value already in assets/config.js. */
+const fs = require("fs");
+const path = "assets/config.js";
+const src = fs.readFileSync(path, "utf8");
+const m = src.match(/window\.PP\s*=\s*(\{[\s\S]*?\});?\s*$/);
+let cfg = {};
+try { cfg = new Function("return " + m[1])(); } catch (e) { cfg = {}; }
+const e = process.env;
+const map = { ORDERS_ENDPOINT: "ordersEndpoint", ADMIN_EMAIL: "adminEmail", GOOGLE_CLIENT_ID: "googleClientId", MAPBOX_TOKEN: "mapboxToken", MAPBOX_STYLE: "mapStyle" };
+Object.keys(map).forEach((k) => { if (e[k] && e[k].trim()) cfg[map[k]] = e[k].trim(); });
+fs.writeFileSync(path, "/* Generated at deploy time from environment variables. */\nwindow.PP = " + JSON.stringify(cfg, null, 2) + ";\n");
+console.log("config.js written. Google sign-in:", cfg.googleClientId ? "on" : "off", "| map token:", cfg.mapboxToken ? "set" : "missing");

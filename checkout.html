@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="./">
+  <script>try{if(!localStorage.getItem("pp-session")){location.replace("./auth.html?next=checkout.html")}}catch(e){}</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Checkout | VITAME</title>
+  <meta name="description" content="Tell us where to send your cold-pressed juice, pick your delivery speed and pay securely." />
+  <meta name="theme-color" content="#ff8c2e" />
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEXUlEQVR42u1bPW8TSRh+ZmY3ibNZe/0VQyDcNZQUV9EABboC6XRId1DwISSoEB0IKqT7AVddcX8BiYZ/cFdeQ41EQYEIJLmQ2MF2cGzH8QzF7mzs4I9ZM3HGXl4pzWhm18/zvvO87zuzIYhgSzlPYAJsvVgmqnPJtIAelQw6zeBVMJBpBa4aDTQu4Ptho3EB3w8jRcyNxsn7vbDSuIE/TELst4Cl60EPn97CbzcuA4SA0t61B29zgBC8ePYv/v7zOSgl4NwPPsooeJvj5r0ruP/oOkgw1rWeC1BK8PK/V3hy/y89GqAr/K/d/hmU0b7gAYBQn5xfr1+Cm3TAuQAhwXzhg/vl94tgrHdgymefv3BO2zbQtgUajT3luZxzMOvg1YT4kTDvJOBl3JAsHe9SzgLfasXNcuDI/gFFCIEQAnOJWWSyyWDM/wOATC6JZMoJ5x42+Wz5LqMIGBT63SAAxii8TBKHGcgtpsNo0PGusRKgatKLuUUvbEYknOUfCkOj6MgKoXGbm3S+GiuczCj28AZGQFSvnVjKfjV26kxBaW2bc/MIYIxFOoGRBIggv3eO9RJAABDBvNWVj+YR8Gm7Goqcis3M2iEhQgjYtoVUekEtAtpt8wgoydQ0jIHAu+lsMkyLAOC4CXhpt3PKwHQ6sVtAWsrr9nYml8K8MwchhFaA4xNBqMW+xJbyFuCl3XD/54MaQPDhz1l5+795BERNTTMzdqgDALD8YyEUxWHWbLbMI0BVmGSlZ9kM+UJ6YFrs28JazDwC3kUMS0IIbNvqKILUCdip1gyMgH311CSV/+TpXDiWzae66oRBArL2ftNADRhBuRPzc2FNkMunoZQDgb7nBRNVCgPAqeW8XxNkkkhnXVX8htYBIwiTs5DwU2DBw+zcjHINsN8ysBLc2thWDmE5Q2pAYSmnfA7A2xxrHwzUgFKxEnmNbft1wPKZxUjruMbzAm0ERMrNQZTI/j8V9ADHYccigp3lsOMmDtpgxcWUTPCR2GHhdN35g4pQAVhrr4VGvTnZdYBsgyklOPfTWWTz3lD8MsKqlRqKWxVtBGi7GYqamiRhj/+4A8dNKJNIBtw8HWsErL7fBG/zyD9Oglf+wZSYWQipngeMKp5y2m6tgVZrfzpEMJJ2BAxsl6rYM/E8YGx5m+o9LtNHwJhuc3TfGmm8G6QDb3S11Q6MmUlApfwZtc/1I/GSL7K+6bwZ1krATnUX9d3mkUdApbxjJgGM0bGc51uWZSYB47rS1tkHTGQaXNV4IDqRBOjeZlq7wXFogLF1QL3eRGmrfOQ1UefXZUa1w7zN0WjsQQgR/On3POcC1XLNTAIAwLYtEELAmP6tIM8cN9ZLep+7XiwTXV+Lvnj2D+4+uApCqdamRd4XbKwV8eb1SteHFd9i68Wyr1px/FpcEvD9HyYkE3H0flcajBMJnVi/b4F+zMTB+z0jYJpJ6IVtINhpSY+DnEpHXTgN4IdGwKRGRBTHfQEBVYbCDUreaQAAAABJRU5ErkJggg==" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <script src="./assets/stock.js" defer></script>
+  <style>
+    :root{--bg:#ff8c2e;--ink:#1a1410;--cream:#fff7eb;--tangerine:#ff8a2a;--lemon:#ffdc52;--beet:#e03442;--leaf:#4aae4d;
+      --font-display:'Anton','Impact',sans-serif;--font-text:'Inter',system-ui,sans-serif;--font-price:'Space Grotesk','Inter',sans-serif;
+      --hard:5px 5px 0 var(--ink)}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{font-family:var(--font-text);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh}
+    button,input,textarea{font:inherit;color:inherit}
+    a{color:inherit}
+    [hidden]{display:none!important}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px clamp(16px,4vw,48px)}
+    .logo{display:inline-flex;align-items:center;gap:10px;font:400 1.7rem var(--font-display);letter-spacing:.02em;text-decoration:none}
+    .logo b{font-weight:400;color:var(--cream)}
+    .logo-mark{width:30px;height:30px;border-radius:50%;border:2px solid var(--ink);background:radial-gradient(circle,var(--ink) 0 3px,transparent 4px),conic-gradient(var(--cream) 0 12.5%,var(--ink) 0 25%,var(--cream) 0 37.5%,var(--ink) 0 50%,var(--cream) 0 62.5%,var(--ink) 0 75%,var(--cream) 0 87.5%,var(--ink) 0)}
+    .back{font-weight:700;font-size:.92rem;text-decoration:none;border:3px solid var(--ink);border-radius:999px;padding:.55em 1.1em;background:var(--cream);box-shadow:3px 3px 0 var(--ink);transition:transform .2s,box-shadow .2s}
+    .back:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+    main{max-width:1180px;margin:0 auto;padding:6px clamp(16px,4vw,48px) 64px}
+    h1{font:400 clamp(3rem,8vw,6rem)/.9 var(--font-display);text-transform:uppercase;margin:6px 0 6px}
+    h1 em{font-style:normal;color:var(--cream)}
+    .lede{margin:0 0 28px;font-weight:500;max-width:34em}
+    .grid{display:grid;gap:24px;align-items:start}
+    @media(min-width:960px){.grid{grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr)}.sum{position:sticky;top:20px}}
+    .card{background:var(--cream);border:3px solid var(--ink);border-radius:26px;box-shadow:var(--hard);padding:clamp(18px,3vw,30px)}
+    .card+.card{margin-top:22px}
+    .sec{display:flex;align-items:center;gap:12px;margin:0 0 18px}
+    .sec i{font:700 .95rem var(--font-price);font-style:normal;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--cream);flex:none}
+    .sec h2{font:400 clamp(1.5rem,3vw,2rem)/1 var(--font-display);text-transform:uppercase;margin:0}
+    .f{display:grid;gap:14px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:520px){.two{grid-template-columns:1fr}}
+    label.l{display:block;font-weight:700;font-size:.85rem;margin-bottom:6px}
+    .in{width:100%;min-height:48px;padding:12px 16px;border-radius:14px;border:3px solid var(--ink);background:#fff;font-weight:500;outline:0;transition:box-shadow .2s}
+    textarea.in{resize:vertical;min-height:86px;line-height:1.4}
+    .in::placeholder{color:#1a141066}
+    .in:focus{box-shadow:4px 4px 0 var(--tangerine)}
+    .in[aria-invalid=true]{border-color:var(--beet)}
+    .err{color:var(--beet);font-weight:600;font-size:.8rem;margin:5px 0 0;min-height:0}
+    .hint{font-size:.78rem;opacity:.6;margin:5px 0 0}
+
+    .ship{display:grid;gap:12px}
+    .opt{position:relative;display:block;cursor:pointer}
+    .opt input{position:absolute;opacity:0;inset:0;cursor:pointer}
+    .opt-in{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:16px 18px;border:3px solid var(--ink);border-radius:20px;background:#fff;transition:transform .2s,box-shadow .2s,background .2s}
+    .opt:hover .opt-in{transform:translate(-1px,-1px)}
+    .opt input:checked+.opt-in{background:var(--lemon);box-shadow:4px 4px 0 var(--ink)}
+    .opt input:focus-visible+.opt-in{outline:3px solid var(--tangerine);outline-offset:3px}
+    .dot{width:22px;height:22px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:grid;place-items:center}
+    .opt input:checked+.opt-in .dot:after{content:"";width:10px;height:10px;border-radius:50%;background:var(--ink)}
+    .opt-t{font-weight:700;font-size:1.02rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .tag{font:700 .64rem var(--font-price);letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--cream);border-radius:999px;padding:.3em .7em}
+    .opt-d{font-size:.86rem;opacity:.75;margin-top:3px}
+    .opt-date{font-weight:700;font-size:.95rem;margin-top:6px}
+    .opt-p{font:700 1.15rem var(--font-price);white-space:nowrap}
+    .eta{margin:16px 0 0;padding:14px 16px;border:3px dashed var(--ink);border-radius:18px;font-weight:600;display:flex;gap:10px;align-items:center}
+    .eta b{font:400 1.35rem var(--font-display);text-transform:uppercase;letter-spacing:.02em}
+
+    /* summary */
+    .sum{background:var(--ink);color:var(--cream);box-shadow:5px 5px 0 var(--cream)}
+    .sum h2{font:400 1.8rem/1 var(--font-display);text-transform:uppercase;margin:0 0 16px}
+    .lines{display:grid;gap:14px;margin:0 0 18px;padding:0;list-style:none}
+    .line{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center}
+    .thumb{width:56px;height:56px;border-radius:14px;background:var(--tangerine);border:2px solid var(--cream);display:grid;place-items:center;overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:contain}
+    .ln{font-weight:700;line-height:1.2}
+    .ld{font-size:.8rem;opacity:.7;margin-top:2px}
+    .lp{font:700 1rem var(--font-price);text-align:right}
+    .lp s{display:block;font-weight:500;opacity:.55;font-size:.8rem}
+    dl{margin:0;display:grid;gap:8px;border-top:2px dashed rgba(255,247,235,.3);padding-top:14px}
+    dl div{display:flex;justify-content:space-between;gap:12px}
+    dt{opacity:.8}
+    dd{margin:0;font:600 1rem var(--font-price)}
+    dl .save dd{color:var(--lemon)}
+    dl .tot{border-top:2px solid var(--cream);padding-top:12px;margin-top:4px;align-items:baseline}
+    dl .tot dt{font:400 1.6rem var(--font-display);text-transform:uppercase;opacity:1}
+    dl .tot dd{font-size:1.8rem;font-weight:700}
+    .pay{width:100%;height:58px;margin-top:20px;border-radius:999px;border:3px solid var(--cream);background:var(--tangerine);color:var(--ink);font:700 1.05rem var(--font-text);cursor:pointer;box-shadow:4px 4px 0 var(--cream);transition:transform .2s,box-shadow .2s}
+    .pay:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--cream)}
+    .pay:disabled{opacity:.55;cursor:not-allowed}
+    .msg{min-height:1.3em;margin:12px 0 0;font-weight:600;font-size:.88rem;color:var(--lemon);text-align:center}
+    .secure{margin:10px 0 0;text-align:center;font-size:.76rem;opacity:.65}
+    .empty,.done{text-align:center;max-width:560px;margin:30px auto}
+    .empty h2,.done h2{font:400 clamp(2rem,6vw,3rem)/1 var(--font-display);text-transform:uppercase;margin:0 0 10px}
+    .pill{display:inline-flex;margin-top:12px;padding:.85em 1.6em;border-radius:999px;border:3px solid var(--ink);background:var(--tangerine);font-weight:700;text-decoration:none;box-shadow:var(--hard)}
+    .done dl{text-align:left;border-top-color:rgba(26,20,16,.3);margin:18px 0}
+    .done dd{font-weight:600}
+      .logo-img{display:block;height:30px;width:auto;filter:none!important}
+  </style>
+
+  <script src="./assets/config.js"></script>
+  <link rel="stylesheet" href="./assets/pip.css">
+  <script src="./assets/pip.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="./index.html"><img class="logo-img" src="./media/vitame-ink.webp" alt="Vitame" width="111" height="30"></a>
+    <a class="back" href="./shop.html">&larr; Keep shopping</a>
+  </header>
+
+  <main>
+    <h1>Check<em>out</em></h1>
+    <p class="lede" data-lede>Tell us where to send your juice, pick how fast it travels, then pay.</p>
+
+    <div data-empty class="card empty" hidden>
+      <h2>Your box is empty</h2>
+      <p>Add a few bottles or build a 6-pack first.</p>
+      <a class="pill" href="./shop.html">Go to the shop</a>
+    </div>
+
+    <div class="grid" data-main hidden>
+      <form id="co" novalidate>
+        <section class="card" aria-labelledby="s1">
+          <div class="sec"><i>1</i><h2 id="s1">Your details</h2></div>
+          <div class="f">
+            <div><label class="l" for="name">Full name</label><input class="in" id="name" name="name" autocomplete="name" placeholder="Asha Rao"><p class="err" data-err="name"></p></div>
+            <div class="two">
+              <div><label class="l" for="email">Email</label><input class="in" id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"><p class="err" data-err="email"></p></div>
+              <div><label class="l" for="phone">Phone number</label><input class="in" id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="98765 43210"><p class="err" data-err="phone"></p></div>
+            </div>
+            <div><label class="l" for="address">Delivery address</label><textarea class="in" id="address" name="address" autocomplete="street-address" placeholder="Flat or house no., building, street, area"></textarea><p class="err" data-err="address"></p></div>
+            <div class="two">
+              <div><label class="l" for="city">City</label><input class="in" id="city" name="city" autocomplete="address-level2" placeholder="Indore"><p class="err" data-err="city"></p></div>
+              <div><label class="l" for="pin">PIN code</label><input class="in" id="pin" name="pin" inputmode="numeric" maxlength="6" autocomplete="postal-code" placeholder="452001"><p class="err" data-err="pin"></p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="s2">
+          <div class="sec"><i>2</i><h2 id="s2">Delivery</h2></div>
+          <div class="ship" role="radiogroup" aria-label="Delivery speed">
+            <label class="opt"><input type="radio" name="ship" value="normal" checked>
+              <div class="opt-in"><span class="dot"></span>
+                <div><div class="opt-t">Normal delivery</div><div class="opt-d">Insulated box, ice packed. Arrives in 3 days.</div><div class="opt-date" data-date="normal"></div></div>
+                <div class="opt-p" data-price="normal"></div></div></label>
+            <label class="opt"><input type="radio" name="ship" value="premium">
+              <div class="opt-in"><span class="dot"></span>
+                <div><div class="opt-t">Premium delivery <span class="tag">Fastest</span></div><div class="opt-d">Next day, priority courier, delivered cold and fresh.</div><div class="opt-date" data-date="premium"></div></div>
+                <div class="opt-p" data-price="premium"></div></div></label>
+          </div>
+          <div class="eta" aria-live="polite"><span>Your juice arrives on</span><b data-eta></b></div>
+        </section>
+      </form>
+
+      <aside class="card sum" aria-labelledby="s3">
+        <h2 id="s3">Your box</h2>
+        <ul class="lines" data-lines></ul>
+        <dl>
+          <div><dt>Subtotal</dt><dd data-sub></dd></div>
+          <div class="save" data-save-row hidden><dt>Subscribe &amp; save</dt><dd data-save></dd></div>
+          <div><dt data-ship-label>Delivery</dt><dd data-ship></dd></div>
+          <div class="tot"><dt>Total</dt><dd data-total></dd></div>
+        </dl>
+        <button class="pay" type="button" data-pay>Pay securely</button>
+        <p class="msg" role="status" aria-live="polite" data-msg></p>
+        <p class="secure">Payments are handled by Razorpay: UPI, cards, netbanking and wallets.</p>
+      </aside>
+    </div>
+
+    <div data-done class="card done" hidden>
+      <h2 data-done-h>Order placed</h2>
+      <p data-done-msg></p>
+      <dl data-done-dl></dl>
+      <a class="pill" href="./orders.html" data-track-link>Track my order</a>
+      <a class="pill" href="./index.html" style="background:var(--cream);margin-left:10px">Back to the shop</a>
+    </div>
+  </main>
+
+  <script>
+  (function(){
+    // ===== Razorpay config. Paste your Razorpay Key ID (rzp_test_... or rzp_live_...) here. It is a public key. =====
+    var RAZORPAY_KEY_ID='';
+    // ===== Orders backend. Paste the Google Apps Script web app URL (ends in /exec) here. See backend/README.md. =====
+    var ORDERS_ENDPOINT='https://script.google.com/macros/s/AKfycbxm8HTo7xghfsbAbJPx1jZUoPAj-VsDuLsxB_F_UiZZCOFLyoU1JTKpU3UJyZGeFLDrvA/exec';
+
+    var PREMIUM_FEE=99, NORMAL_FEE=49, FREE_OVER=400, SINGLE=60;
+    var $=function(s,r){return (r||document).querySelector(s)};
+    var money=function(n){return '₹'+(Math.abs(n%1)<.005?Math.round(n):n.toFixed(2))};
+    var subPrice=function(u){return u===330?260:Math.round(u*.8*100)/100};
+
+    var cart=[];try{cart=JSON.parse(localStorage.getItem('pp-cart')||'[]')}catch(e){}
+    var session=null;try{session=JSON.parse(localStorage.getItem('pp-session')||'null')}catch(e){}
+    var main=$('[data-main]'),empty=$('[data-empty]');
+    if(!cart.length){empty.hidden=false;$('[data-lede]').hidden=true;return}
+    main.hidden=false;
+
+    // prefill from the login
+    if(session){ if(session.name)$('#name').value=session.name; if(session.email)$('#email').value=session.email }
+    try{var last=JSON.parse(localStorage.getItem('pp-profile')||'null');if(last){['name','phone','address','city','pin'].forEach(function(k){if(last[k]&&!$('#'+k).value)$('#'+k).value=last[k]});if(last.email&&!$('#email').value)$('#email').value=last.email}}catch(e){}
+
+    // ----- totals
+    var anySub=cart.some(function(i){return i.sub});
+    var full=0,paid=0;
+    cart.forEach(function(i){full+=i.unit*i.qty;paid+=(i.sub?subPrice(i.unit):i.unit)*i.qty});
+    var saved=full-paid;
+    var normalFee=(paid>=FREE_OVER||anySub)?0:NORMAL_FEE;
+    function shipVal(){return $('input[name=ship]:checked').value}
+    function fee(){return shipVal()==='premium'?PREMIUM_FEE:normalFee}
+    function total(){return paid+fee()}
+
+    // ----- delivery dates
+    var fmt=new Intl.DateTimeFormat('en-IN',{weekday:'short',day:'numeric',month:'long'});
+    function addDays(n){var d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return d}
+    var dates={normal:addDays(3),premium:addDays(1)};
+    $('[data-date=normal]').textContent='Arrives '+fmt.format(dates.normal);
+    $('[data-date=premium]').textContent='Arrives '+fmt.format(dates.premium);
+    $('[data-price=normal]').textContent=normalFee?money(normalFee):'Free';
+    $('[data-price=premium]').textContent=money(PREMIUM_FEE);
+
+    // ----- summary
+    var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+    $('[data-lines]').innerHTML=cart.map(function(i){
+      var img=i.kind==='pack'?'media/box.webp':'media/bottle-'+esc(i.flavour||'orange')+'.webp';
+      var line=(i.sub?subPrice(i.unit):i.unit)*i.qty;
+      return '<li class="line"><span class="thumb"><img src="./'+img+'" alt=""></span><div><div class="ln">'+esc(i.name)+(i.qty>1?' &times; '+i.qty:'')+'</div><div class="ld">'+esc(i.detail||'')+(i.sub?' &middot; subscription':'')+'</div></div><div class="lp">'+(i.sub?'<s>'+money(i.unit*i.qty)+'</s>':'')+money(line)+'</div></li>'}).join('');
+    function paint(){
+      $('[data-sub]').textContent=money(full);
+      $('[data-save-row]').hidden=!saved;$('[data-save]').textContent='-'+money(saved);
+      var f=fee();$('[data-ship]').textContent=f?money(f):'Free';
+      $('[data-ship-label]').textContent=shipVal()==='premium'?'Premium delivery':'Delivery';
+      $('[data-total]').textContent=money(total());
+      $('[data-eta]').textContent=fmt.format(dates[shipVal()]);
+    }
+    document.querySelectorAll('input[name=ship]').forEach(function(r){r.addEventListener('change',paint)});
+    paint();
+
+    // ----- validation
+    var rules={
+      name:function(v){return v.trim().length>=2||'Please enter your full name.'},
+      email:function(v){return /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v.trim())||'Enter a valid email address.'},
+      phone:function(v){var d=v.replace(/[\s\-()]/g,'').replace(/^(\+91|91|0)(?=\d{10}$)/,'');return /^[6-9]\d{9}$/.test(d)||'Enter a valid 10-digit mobile number.'},
+      address:function(v){return v.trim().length>=8||'Please enter your full delivery address.'},
+      city:function(v){return v.trim().length>=2||'Please enter your city.'},
+      pin:function(v){return /^[1-9]\d{5}$/.test(v.trim())||'Enter a valid 6-digit PIN code.'}
+    };
+    function check(k){var el=$('#'+k),r=rules[k](el.value),e=$('[data-err='+k+']');
+      if(r===true){el.removeAttribute('aria-invalid');e.textContent='';return true}
+      el.setAttribute('aria-invalid','true');e.textContent=r;return false}
+    Object.keys(rules).forEach(function(k){$('#'+k).addEventListener('blur',function(){if(this.value)check(k)});$('#'+k).addEventListener('input',function(){if(this.getAttribute('aria-invalid'))check(k)})});
+    function validAll(){var bad=Object.keys(rules).filter(function(k){return !check(k)});if(bad.length)$('#'+bad[0]).focus();return !bad.length}
+
+    // ----- pay
+    var btn=$('[data-pay]'),msg=$('[data-msg]');
+    var LABEL=RAZORPAY_KEY_ID?'Pay securely':'Place order';
+    btn.textContent=LABEL;
+    if(!RAZORPAY_KEY_ID)$('.secure').textContent='Online payment is being set up. Your order is saved now and we will confirm payment with you.';
+
+    // ----- order storage (Google Sheet via Apps Script). Orders that fail to send are kept and retried.
+    function post(payload){
+      var ctl=window.AbortController?new AbortController():null,t=ctl&&setTimeout(function(){ctl.abort()},15000);
+      return fetch(ORDERS_ENDPOINT,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),signal:ctl?ctl.signal:undefined})
+        .then(function(r){return r.json()}).then(function(j){clearTimeout(t);return j});
+    }
+    function outbox(){try{return JSON.parse(localStorage.getItem('pp-outbox')||'[]')}catch(e){return[]}}
+    function saveOutbox(a){try{localStorage.setItem('pp-outbox',JSON.stringify(a))}catch(e){}}
+    function submitOrder(payload){
+      if(!ORDERS_ENDPOINT)return Promise.resolve({ok:true,local:true});
+      return post(payload).then(function(j){
+        if(j&&j.ok)return j;
+        if(j&&j.error)return {ok:false,error:j.error};
+        throw new Error('bad response');
+      }).catch(function(){var q=outbox();q.push(payload);saveOutbox(q);return {ok:true,queued:true}});
+    }
+    if(ORDERS_ENDPOINT){var q=outbox();if(q.length){saveOutbox([]);q.forEach(function(pl){post(pl).then(function(j){if(!(j&&(j.ok||j.error))){var a=outbox();a.push(pl);saveOutbox(a)}}).catch(function(){var a=outbox();a.push(pl);saveOutbox(a)})})}}
+
+    function cartIds(){var o=[];cart.forEach(function(i){if(i.flavour)o.push(i.flavour);if(i.mix)Object.keys(i.mix).forEach(function(k){if(i.mix[k]>0)o.push(k)})});return o}
+    function say(t){msg.textContent=t}
+    function details(){return {name:$('#name').value.trim(),email:$('#email').value.trim(),phone:$('#phone').value.replace(/[\s\-()]/g,'').replace(/^(\+91|91|0)(?=\d{10}$)/,''),address:$('#address').value.trim(),city:$('#city').value.trim(),pin:$('#pin').value.trim()}}
+
+    function isoLocal(x){return x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'+('0'+x.getDate()).slice(-2)}
+    function payload(d,status,payId){
+      return {name:d.name,email:d.email,phone:d.phone,address:d.address,city:d.city,pin:d.pin,ship:shipVal(),deliveryDate:fmt.format(dates[shipVal()]),deliveryISO:isoLocal(dates[shipVal()]),
+        subtotal:full,discount:saved,shipFee:fee(),total:total(),payStatus:status,paymentId:payId||'',website:'',
+        items:cart.map(function(i){return {name:i.name,detail:i.detail||'',qty:i.qty,flavour:i.flavour||'',mix:i.mix||null,sub:!!i.sub,freq:i.sub?(i.freq||'fortnight'):''}})};
+    }
+    function success(resp,d,status,res){
+      var order={id:(res&&res.orderId)||('LOCAL-'+Date.now().toString(36).toUpperCase()),token:(res&&res.token)||'',payId:resp.razorpay_payment_id||'',total:total(),paid:total(),pay:status,status:status,ship:shipVal(),date:fmt.format(dates[shipVal()]),to:d,items:cart,at:Date.now(),subtotal:full,discount:saved,shipFee:fee()};
+      try{var all=JSON.parse(localStorage.getItem('pp-orders')||'[]');all.push(order);localStorage.setItem('pp-orders',JSON.stringify(all));localStorage.setItem('pp-profile',JSON.stringify(d));localStorage.removeItem('pp-cart')}catch(e){}
+      main.hidden=true;$('[data-lede]').hidden=true;$('[data-done]').hidden=false;
+      $('[data-done-h]').textContent=status==='Paid'?'Order placed':'Order received';
+      $('[data-done-msg]').textContent='Thank you, '+d.name.split(' ')[0]+'. '+(status==='Paid'?'Your payment went through and your order is confirmed.':'We have your order and will confirm payment with you.')+(ORDERS_ENDPOINT?' A confirmation is on its way to your email and phone.':'');
+      $('[data-done-dl]').innerHTML=(res&&res.orderId?'<div><dt>Order number</dt><dd>'+esc(order.id)+'</dd></div>':'')+(order.payId?'<div><dt>Payment ID</dt><dd>'+esc(order.payId)+'</dd></div>':'')+'<div><dt>'+(status==='Paid'?'Amount paid':'Amount due')+'</dt><dd>'+money(order.paid)+'</dd></div><div><dt>Delivery</dt><dd>'+(order.ship==='premium'?'Premium':'Normal')+'</dd></div><div><dt>Arriving</dt><dd>'+order.date+'</dd></div><div><dt>Delivering to</dt><dd>'+esc(d.address+', '+d.city+' '+d.pin)+'</dd></div>';
+      var tl=$('[data-track-link]');if(order.token)tl.href='./orders.html#'+order.id;
+      if(res&&res.subs&&res.subs.length){
+        try{var ss=JSON.parse(localStorage.getItem('pp-subs')||'[]');res.subs.forEach(function(x){if(!ss.some(function(y){return y.id===x.id}))ss.push(x)});localStorage.setItem('pp-subs',JSON.stringify(ss))}catch(e){}
+        $('[data-done-msg]').textContent+=' Your subscription is set up too: we remind you before each delivery, and you can skip, pause or swap flavours any time from My subscriptions.';
+        var ma=document.createElement('a');ma.className='pill solid';ma.href='./subscriptions.html';ma.textContent='Manage my subscription';ma.style.marginLeft='10px';tl.parentNode.insertBefore(ma,tl.nextSibling);
+      }
+      window.scrollTo(0,0);
+    }
+
+    btn.addEventListener('click',function(){
+      say('');
+      if(!validAll()){say('Please fix the highlighted fields.');return}
+      if(window.ppStock&&window.ppStock.block(cartIds()))return; // a drink in the box sold out
+      var d=details();
+      var fail=function(t){btn.disabled=false;btn.textContent=LABEL;say(t)};
+      if(!RAZORPAY_KEY_ID){
+        btn.disabled=true;btn.textContent='Placing order...';
+        submitOrder(payload(d,'Pending','')).then(function(res){if(!res.ok)return fail(res.error||'Could not place the order. Please try again.');success({},d,'Pending',res)});
+        return;
+      }
+      btn.disabled=true;btn.textContent='Opening payment...';
+      var open=function(){
+        try{
+          var rz=new Razorpay({
+            key:RAZORPAY_KEY_ID,amount:Math.round(total()*100),currency:'INR',name:'Vitame',
+            description:cart.length+' item'+(cart.length===1?'':'s')+' - '+(shipVal()==='premium'?'Premium':'Normal')+' delivery',
+            image:'./media/og.jpg',
+            prefill:{name:d.name,email:d.email,contact:d.phone},
+            notes:{address:d.address+', '+d.city+' '+d.pin,delivery:shipVal(),delivery_date:fmt.format(dates[shipVal()])},
+            theme:{color:'#ff8a2a'},
+            modal:{ondismiss:function(){btn.disabled=false;btn.textContent=LABEL;say('Payment cancelled. Your box is saved.')}},
+            handler:function(resp){btn.textContent='Saving your order...';submitOrder(payload(d,'Paid',resp.razorpay_payment_id)).then(function(res){success(resp,d,'Paid',res)})}
+          });
+          rz.on('payment.failed',function(r){btn.disabled=false;btn.textContent=LABEL;say((r&&r.error&&r.error.description)||'Payment failed. Please try again.')});
+          rz.open();
+        }catch(e){btn.disabled=false;btn.textContent=LABEL;say('Could not open the payment window. Please try again.')}
+      };
+      if(window.Razorpay)return open();
+      var s=document.createElement('script');s.src='https://checkout.razorpay.com/v1/checkout.js';
+      s.onload=open;s.onerror=function(){btn.disabled=false;btn.textContent=LABEL;say('Could not reach Razorpay. Check your connection and try again.')};
+      document.head.appendChild(s);
+    });
+  })();
+  </script>
+</body>
+</html>
