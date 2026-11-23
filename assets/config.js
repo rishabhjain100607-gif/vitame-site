@@ -6,9 +6,10 @@ window.PP = {
   googleClientId: '',
   // Firebase web config (public values). On Vercel they come from FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN and FIREBASE_PROJECT_ID.
   firebase: { apiKey: '', authDomain: '', projectId: '' },
-  // Payment window (assets/pay.js). mode 'demo' = test mode, nothing is charged. mode 'live' = only UPI to your own UPI ID and cash on delivery are real.
-  // On Vercel these come from PAYMENT_MODE, UPI_ID, UPI_PAYEE and EMI_MIN (see build-config.js).
-  pay: { mode: 'demo', upiId: '', payee: 'Vitame', emiMin: 3000 },
+  // Payment window (assets/pay.js). mode 'live': UPI goes straight to upiId, so it is real money. mode 'demo' is a test mode where nothing is charged.
+  // methods: what customers can choose. For now only UPI. Others that exist: 'cod', and the test-mode-only 'card', 'wallet', 'later', 'emi' (or 'all').
+  // On Vercel these can be overridden with PAYMENT_MODE, UPI_ID, UPI_PAYEE, PAY_METHODS (comma separated) and EMI_MIN (see build-config.js).
+  pay: { mode: 'live', upiId: 'rishabhjain100607-1@oksbi', payee: 'Vitame', methods: ['upi'], emiMin: 3000 },
   // The shop owner's login email. The admin portal opens only when the server accepts this email with its password.
   adminEmail: 'i25rishabhj@iimidr.ac.in',
   // Mapbox public token (pk.). On Vercel it is filled in at deploy time from the MAPBOX_TOKEN environment variable (see build-config.js).

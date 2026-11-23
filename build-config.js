@@ -15,6 +15,7 @@ cfg.pay = cfg.pay || {};
 [["PAYMENT_MODE", "mode"], ["UPI_ID", "upiId"], ["UPI_PAYEE", "payee"]].forEach((p) => { if (e[p[0]] && e[p[0]].trim()) cfg.pay[p[1]] = e[p[0]].trim(); });
 if (cfg.pay.mode !== "live") cfg.pay.mode = "demo";
 if (Number(e.EMI_MIN) > 0) cfg.pay.emiMin = Number(e.EMI_MIN);
+if (e.PAY_METHODS && e.PAY_METHODS.trim()) cfg.pay.methods = e.PAY_METHODS.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean);
 fs.writeFileSync(path, "/* Generated at deploy time from environment variables. */\nwindow.PP = " + JSON.stringify(cfg, null, 2) + ";\n");
-console.log("Payments:", cfg.pay.mode, cfg.pay.upiId ? "| UPI id set" : "| no UPI id");
+console.log("Payments:", cfg.pay.mode, cfg.pay.upiId ? "| UPI id set" : "| no UPI id", "| methods:", [].concat(cfg.pay.methods || ["upi"]).join(","));
 console.log("config.js written. Google sign-in:", cfg.googleClientId ? "on" : "off", "| Firebase:", cfg.firebase.apiKey ? "on" : "off", "| map token:", cfg.mapboxToken ? "set" : "missing");

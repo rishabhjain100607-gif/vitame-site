@@ -3,12 +3,14 @@
  * No payment provider is connected, so this window is honest about what it can do:
  *   - UPI to the shop's own UPI ID (QR code and app buttons) and Cash on delivery are real. The order is saved with the payment
  *     "Pending", and the shop confirms the UPI reference against the bank before it ships.
- *   - Cards, netbanking, wallets, pay later and EMI are a TEST-MODE simulation (config pay.mode = 'demo'). No money moves, only
+ *   - Cards, wallets, pay later and EMI are a TEST-MODE simulation (config pay.mode = 'demo'). No money moves, only
  *     well-known test card numbers are accepted, no card data is sent or stored, and nothing is ever saved as "Paid".
  *   - With pay.mode = 'live' the simulated methods are greyed out ("Soon") until a real provider is connected.
  *
  * Settings come from window.PP.pay (assets/config.js, filled from Vercel environment variables by build-config.js):
- *   mode 'demo' | 'live', upiId (the shop's UPI ID, for example vitame@okhdfcbank), payee (name shown in the UPI app), emiMin (rupees).
+ *   mode 'demo' | 'live', upiId (the shop's UPI ID), payee (name shown in the UPI app), emiMin (rupees),
+ *   methods: which options customers see. Default ['upi']. Any of 'upi', 'cod', 'card', 'wallet', 'later', 'emi', or 'all'.
+ *   The card, wallet, pay later and EMI options are test-mode simulations, so only switch them on in mode 'demo'.
  *
  * VitamePay.open({ amount, ref, customer: {name, email, phone}, onSuccess(result) -> Promise<{ok, error?}>, onClose({completed, result}) })
  */
@@ -19,6 +21,15 @@
   var UPI_ID = String(P.upiId || '').trim();
   var PAYEE = String(P.payee || 'Vitame').trim() || 'Vitame';
   var EMI_MIN = Number(P.emiMin) > 0 ? Number(P.emiMin) : 3000;
+  var ALL = ['upi', 'card', 'wallet', 'later', 'emi', 'cod'];
+  var WANT = (function () {
+    var m = P.methods; if (typeof m === 'string') m = m.split(',');
+    if (!Array.isArray(m)) return ['upi'];
+    m = m.map(function (x) { return String(x).trim().toLowerCase(); });
+    if (m.indexOf('all') > -1) return ALL;
+    var r = ALL.filter(function (x) { return m.indexOf(x) > -1; });
+    return r.length ? r : ['upi'];
+  })();
   var UA = navigator.userAgent || '';
   var MOBILE = /Android|iPhone|iPad|iPod/i.test(UA);
   var IOS = /iPhone|iPad|iPod/i.test(UA);
@@ -32,7 +43,6 @@
   var IC = {
     upi: '<path d="M4 7h13l-3-3M20 17H7l3 3"/>',
     card: '<rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6 15h4"/>',
-    nb: '<path d="M3 10l9-6 9 6M5 10v7M9.500 10v7M14.500 10v7M19 10v7M3 20h18"/>',
     wallet: '<path d="M3 7a2 2 0 012-2h13v4M3 7v11a2 2 0 002 2h15V9H5a2 2 0 01-2-2zM16 14.500h.01"/>',
     later: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     emi: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
@@ -42,8 +52,6 @@
   var svg = function (n, extra) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (extra || '') + '>' + IC[n] + '</svg>'; };
 
   /* ---------------------------------------------------------------- catalogues */
-  var BANKS_TOP = [['State Bank of India', 'SBI'], ['HDFC Bank', 'HDFC'], ['ICICI Bank', 'ICICI'], ['Axis Bank', 'AXIS'], ['Kotak Mahindra Bank', 'KMB'], ['Punjab National Bank', 'PNB'], ['Bank of Baroda', 'BOB'], ['Yes Bank', 'YES']];
-  var BANKS_MORE = ['AU Small Finance Bank', 'Bandhan Bank', 'Bank of India', 'Bank of Maharashtra', 'Canara Bank', 'Central Bank of India', 'Federal Bank', 'IDBI Bank', 'IDFC FIRST Bank', 'Indian Bank', 'Indian Overseas Bank', 'IndusInd Bank', 'Karur Vysya Bank', 'RBL Bank', 'South Indian Bank', 'UCO Bank', 'Union Bank of India'];
   var WALLETS = [['Paytm Wallet', 'PTM', 'Paytm'], ['PhonePe Wallet', 'PPE', 'PhonePe'], ['Amazon Pay', 'AMZ', 'Amazon'], ['MobiKwik', 'MBK', 'MobiKwik'], ['Freecharge', 'FC', 'Freecharge'], ['Airtel Money', 'ATL', 'Airtel'], ['JioMoney', 'JIO', 'Jio'], ['Ola Money', 'OLA', 'Ola']];
   var LATER = [['Simpl', 'SMP', 'Pay in 3 parts, no interest'], ['LazyPay', 'LZP', 'Pay on the 15th of next month'], ['ICICI PayLater', 'ICI', 'Pay next month'], ['HDFC FlexiPay', 'HDF', 'Pay later or split'], ['ZestMoney', 'ZST', 'Pay in small parts']];
   var EMI_BANKS = [['HDFC Bank', 'HDFC'], ['ICICI Bank', 'ICICI'], ['State Bank of India', 'SBI'], ['Axis Bank', 'AXIS'], ['Kotak Mahindra Bank', 'KMB'], ['IndusInd Bank', 'IND'], ['RBL Bank', 'RBL'], ['Yes Bank', 'YES']];
@@ -56,17 +64,18 @@
 
   /* ---------------------------------------------------------------- state */
   var S = null;
+  var COD = { id: 'cod', t: 'Cash on delivery', d: 'Pay the courier when it arrives', ok: true, tag: '' };
   function methods() {
-    var live = !DEMO;
-    return [
+    var live = !DEMO, amt = S ? S.amount : 0;
+    var list = [
       { id: 'upi', t: 'UPI', d: 'Google Pay, PhonePe, Paytm, BHIM', ok: DEMO || !!UPI_ID },
       { id: 'card', t: 'Cards', d: 'Credit and debit. Visa, Mastercard, RuPay, Amex', ok: DEMO },
-      { id: 'nb', t: 'Netbanking', d: 'All major Indian banks', ok: DEMO },
       { id: 'wallet', t: 'Wallets', d: 'Paytm, PhonePe, Amazon Pay and more', ok: DEMO },
       { id: 'later', t: 'Pay Later', d: 'Simpl, LazyPay, ICICI PayLater', ok: DEMO },
-      { id: 'emi', t: 'EMI', d: 'Split into monthly payments', ok: DEMO && S.amount >= EMI_MIN, tag: DEMO && S.amount < EMI_MIN ? money(EMI_MIN) + '+' : '' },
-      { id: 'cod', t: 'Cash on delivery', d: 'Pay the courier when it arrives', ok: true }
-    ].map(function (m) { m.tag = m.tag || (!m.ok && live ? 'Soon' : ''); return m; });
+      { id: 'emi', t: 'EMI', d: 'Split into monthly payments', ok: DEMO && amt >= EMI_MIN, tag: DEMO && amt < EMI_MIN ? money(EMI_MIN) + '+' : '' },
+      COD
+    ].filter(function (m) { return WANT.indexOf(m.id) > -1; }).map(function (m) { m.tag = m.tag || (!m.ok && live ? 'Soon' : ''); return m; });
+    return list.some(function (m) { return m.ok; }) ? list : [COD]; // if nothing is usable (for example no UPI ID set), never leave checkout with no way to order
   }
   function later(fn, ms) { var id = setTimeout(fn, ms); S.timers.push(id); return id; }
   function clearTimers() { if (!S) return; S.timers.forEach(function (t) { clearTimeout(t); clearInterval(t); }); S.timers = []; }
@@ -74,10 +83,12 @@
   function open(o) {
     if (S) return;
     S = { o: o || {}, amount: Number(o && o.amount) || 0, method: '', screen: null, view: 'nav', data: { f: {} }, timers: [], last: document.activeElement, res: null, busy: false };
-    var first = methods().filter(function (m) { return m.ok; })[0];
+    var avail = methods(), first = avail.filter(function (m) { return m.ok; })[0];
     S.method = first ? first.id : 'cod';
+    S.solo = avail.length === 1; // one option: no menu, just that option
+    if (S.solo) S.view = 'pane';
     var root = document.createElement('div');
-    root.className = 'vp-veil';
+    root.className = 'vp-veil' + (S.solo ? ' vp-solo' : '');
     root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'vp-title');
     root.innerHTML =
       '<div class="vp"><header class="vp-h"><img src="./media/vitame-cream.webp" alt="Vitame" width="111" height="30"><span class="vp-sec">' + svg('lock') + 'Secure payment</span>' +
@@ -91,17 +102,24 @@
     S.root = root;
     root.addEventListener('click', onClick);
     root.addEventListener('input', onInput);
-    root.addEventListener('change', onInput);
-    root.addEventListener('keydown', onKey);
+    document.addEventListener('keydown', onDocKey, true); // on the document so Esc and Tab still work if focus falls to the page
     paint();
     requestAnimationFrame(function () { root.classList.add('on'); });
     // on a wide screen the first method is already open, so put focus on it; on a phone start at the list
-    var sel = $('[data-nav] [aria-selected=true]', root) || $('[data-nav] button:not(:disabled)', root);
+    var sel = S.solo ? $('#vp-title', root) : ($('[data-nav] [aria-selected=true]', root) || $('[data-nav] button:not(:disabled)', root));
     if (sel) sel.focus({ preventScroll: true });
   }
+  /** Closing from the UPI page after the person started paying asks first, so a paid-but-unrecorded order cannot happen by accident. */
+  function requestClose() {
+    if (!S || S.busy) return;
+    if (!DEMO && S.method === 'upi' && !S.screen && S.data.touched) { setScreen({ t: 'confirmclose' }); return; }
+    close(false);
+  }
 
+  function onDocKey(e) { if (S) onKey(e); }
   function close(completed) {
     if (!S) return;
+    document.removeEventListener('keydown', onDocKey, true);
     clearTimers();
     var s = S; S = null;
     s.root.classList.remove('on');
@@ -138,7 +156,6 @@
     var m = S.method;
     if (m === 'upi') return DEMO ? upiDemoHtml() : upiLiveHtml();
     if (m === 'card') return cardFormHtml('Cards', 'Credit or debit card. We only accept the test cards below.', payLabel());
-    if (m === 'nb') return tilesHtml('Netbanking', 'Pick your bank. You approve the payment on your bank’s page.', BANKS_TOP.map(function (b) { return [b[0], b[1], '']; }), 'bank', 'nb-go', 'Other banks', BANKS_MORE);
     if (m === 'wallet') return tilesHtml('Wallets', 'Pay from your wallet balance.', WALLETS.map(function (w) { return [w[0], w[1], '']; }), 'wallet', 'wallet-go');
     if (m === 'later') return tilesHtml('Pay Later', 'Buy now and pay later with one of these.', LATER, 'later', 'later-go');
     if (m === 'emi') return emiHtml();
@@ -154,8 +171,9 @@
       '<div class="vp-acts"><button class="vp-btn full" type="button" data-a="upi-pay">' + esc(payLabel()) + '</button></div>';
   }
   function upiParams() {
+    // Only the fields every UPI app accepts for any UPI ID. The merchant-only reference (tr) is left out on purpose: some apps refuse it for personal IDs.
     var enc = encodeURIComponent, ref = S.o.ref || ('VIT' + rand(6));
-    return 'pa=' + enc(UPI_ID) + '&pn=' + enc(PAYEE) + '&am=' + S.amount.toFixed(2) + '&cu=INR&tn=' + enc('Vitame order ' + ref) + '&tr=' + enc(ref);
+    return 'pa=' + enc(UPI_ID) + '&pn=' + enc(PAYEE) + '&am=' + S.amount.toFixed(2) + '&cu=INR&tn=' + enc('Vitame ' + ref);
   }
   function qrSvg() {
     try {
@@ -172,7 +190,8 @@
       : '<div class="vp-step"><i>1</i><div><b>Scan with any UPI app</b><div class="vp-qr" style="margin-top:10px"><div data-qr>' + qrSvg() + '</div><div><p>Pay <b>' + esc(money(S.amount)) + '</b> to <b>' + esc(PAYEE) + '</b></p><p class="vp-hint" style="margin:0">Or send it to this UPI ID:</p><div class="vp-id"><code>' + esc(UPI_ID) + '</code><button class="vp-chip" type="button" data-a="copy">Copy</button></div></div></div></div></div>';
     return head('UPI', 'Pay straight to ' + PAYEE + ' with any UPI app. No fees.') + '<div class="vp-upi">' + pay +
       '<div class="vp-step"><i>2</i><div><label class="vp-l" for="vp-utr">After paying, enter the UPI reference (UTR, 12 digits)</label><input class="vp-in" id="vp-utr" inputmode="numeric" autocomplete="off" placeholder="412345678901" value="' + val('utr') + '"' + inv('utr') + '>' + err('utr') +
-      '<p class="vp-hint">You find it in your UPI app under the payment details. We check it against our bank account, then confirm your order.</p></div></div></div>' +
+      '<p class="vp-hint">You find it in your UPI app under the payment details. We check it against our bank account, then confirm your order.</p>' +
+      '<div class="vp-chips"><button class="vp-chip" type="button" data-a="upi-noutr">I paid but cannot find the reference</button></div></div></div></div>' +
       '<div class="vp-acts"><button class="vp-btn full" type="button" data-a="upi-paid">I have paid ' + esc(money(S.amount)) + '</button></div>';
   }
 
@@ -247,14 +266,13 @@
       '<div class="vp-acts"><button class="vp-btn full" type="button" data-a="emi-go"' + (d.bank && d.months ? '' : ' disabled') + '>Continue with card</button></div>';
   }
 
-  /* ---------------------------------------------------------------- netbanking, wallets, pay later (tile pickers) */
-  function tilesHtml(title, lede, list, key, go, moreTitle, more) {
+  /* ---------------------------------------------------------------- wallets and pay later (tile pickers) */
+  function tilesHtml(title, lede, list, key, go) {
     var cur = S.data[key] || '';
     var tiles = list.map(function (b) {
       return '<button class="vp-t" type="button" data-a="pick" data-k="' + key + '" data-v="' + esc(b[0]) + '" aria-pressed="' + (cur === b[0]) + '"><span class="vp-mono">' + esc(b[1]) + '</span><span>' + esc(b[0]) + (b[2] ? '<small>' + esc(b[2]) + '</small>' : '') + '</span></button>';
     }).join('');
-    var sel = more ? '<div class="vp-sub">' + esc(moreTitle) + '</div><select class="vp-in" id="vp-more" data-k="' + key + '" aria-label="' + esc(moreTitle) + '"><option value="">Choose another bank</option>' + more.map(function (b) { return '<option' + (cur === b ? ' selected' : '') + '>' + esc(b) + '</option>'; }).join('') + '</select>' : '';
-    return head(title, lede) + '<div class="vp-tiles" role="group" aria-label="' + esc(title) + '">' + tiles + '</div>' + sel +
+    return head(title, lede) + '<div class="vp-tiles" role="group" aria-label="' + esc(title) + '">' + tiles + '</div>' +
       '<div class="vp-acts"><button class="vp-btn full" type="button" data-a="' + go + '"' + (cur ? '' : ' disabled') + '>' + (cur ? 'Pay ' + esc(money(S.amount)) + ' with ' + esc(cur) : 'Choose an option to continue') + '</button></div>';
   }
   function codHtml() {
@@ -270,8 +288,10 @@
     if (s.t === 'busy') return '<div class="vp-c" role="status" aria-live="polite"><div class="vp-spin"></div>' + head(s.title, '') + '<p>' + esc(s.text) + '</p></div>';
     if (s.t === 'saving') return '<div class="vp-c" role="status" aria-live="polite"><div class="vp-spin"></div>' + head('Placing your order', '') + '<p>Please keep this window open for a moment.</p></div>';
     if (s.t === 'done') return '<div class="vp-c" role="status" aria-live="polite"><svg class="vp-tick" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="38"/><path d="M26 43l11 11 21-23"/></svg>' + head(s.title, '') + '<p>' + esc(s.text) + '</p></div>';
+    if (s.t === 'confirmclose') return '<div class="vp-c" role="alertdialog">' + head('Already paid?', '') + '<p>If you have paid, enter your UPI reference first. Without it we cannot match your payment to your order.</p>' +
+      '<div class="vp-acts" style="justify-content:center"><button class="vp-btn" type="button" data-a="retry">Enter my reference</button><button class="vp-btn sec" type="button" data-a="forceclose">Close without paying</button></div></div>';
     if (s.t === 'fail') return '<div class="vp-c" role="alert"><svg class="vp-cross" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="38"/><path d="M30 30l24 24M54 30L30 54"/></svg>' + head(s.title || 'Payment not completed', '') + '<p>' + esc(s.text) + '</p>' +
-      '<div class="vp-acts" style="justify-content:center"><button class="vp-btn" type="button" data-a="retry">Try again</button><button class="vp-btn sec" type="button" data-a="other">Use another method</button></div></div>';
+      '<div class="vp-acts" style="justify-content:center"><button class="vp-btn" type="button" data-a="retry">Try again</button><button class="vp-btn sec" type="button" data-a="other">' + (S.solo ? 'Start again' : 'Use another method') + '</button></div></div>';
     if (s.t === 'orderfail') return '<div class="vp-c" role="alert"><svg class="vp-cross" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="38"/><path d="M30 30l24 24M54 30L30 54"/></svg>' + head('We could not place the order', '') + '<p>' + esc(s.text) + '</p>' +
       '<div class="vp-acts" style="justify-content:center">' + (s.retry ? '<button class="vp-btn" type="button" data-a="resave">Try again</button>' : '') + '<button class="vp-btn sec" type="button" data-a="other">Back</button></div></div>';
     if (s.t === 'wait') return '<div class="vp-c" role="status" aria-live="polite"><div class="vp-spin"></div>' + head('Approve in your UPI app', '') + '<p>We sent a request for <b>' + esc(money(S.amount)) + '</b> to <b>' + esc(s.vpa) + '</b>. Open your UPI app and approve it.</p>' +
@@ -316,23 +336,25 @@
   /* ---------------------------------------------------------------- events */
   function onClick(e) {
     var b = e.target.closest('[data-a]');
-    if (!b) { if (e.target === S.root && !S.busy) close(false); return; }
+    if (e.target.closest('.vp-app')) S.data.touched = true; // they opened their UPI app, so they may be about to pay
+    if (!b) { if (e.target === S.root) requestClose(); return; }
     var a = b.getAttribute('data-a'), v = b.getAttribute('data-v');
-    if (a === 'close') { if (!S.busy) close(false); return; }
+    if (a === 'close') return requestClose();
+    if (a === 'forceclose') return close(false);
     if (a === 'method') { if (S.busy) return; clearTimers(); S.method = v; S.screen = null; S.data = { f: {} }; S.view = 'pane'; paint(); var h = $('#vp-title', S.root); if (h) h.focus({ preventScroll: true }); return; }
     if (a === 'back') { clearTimers(); S.view = 'nav'; S.screen = null; paint(); var m = $('[data-nav] [aria-selected=true]', S.root); if (m) m.focus(); return; }
-    if (a === 'other') { clearTimers(); S.screen = null; S.data = { f: {} }; S.view = 'nav'; paint(); return; }
+    if (a === 'other') { clearTimers(); S.screen = null; S.data = { f: {} }; S.view = S.solo ? 'pane' : 'nav'; paint(); if (S.solo) { var t0 = $('#vp-title', S.root); if (t0) t0.focus({ preventScroll: true }); } return; }
     if (a === 'retry') { clearTimers(); S.screen = null; paintPane(true); return; }
     if (a === 'resave') return finish(S.res);
     if (a === 'handle') { var i = $('#vp-vpa', S.root), cur = (i.value || '').split('@')[0]; i.value = cur + v; S.data.f.vpa = i.value; i.focus(); return; }
     if (a === 'testcard') { S.data.f = Object.assign(S.data.f, { cn: v, nm: (S.data.f.nm && S.data.f.nm.trim().length >= 2) ? S.data.f.nm : ((S.o.customer && S.o.customer.name) || 'Test User'), ex: '12/34', cv: v.indexOf('3782') === 0 ? '1234' : '123' }); S.data.errs = {}; paintPane(); return; }
-    if (a === 'copy') { try { navigator.clipboard.writeText(UPI_ID); b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); } catch (x) { /* ignore */ } return; }
+    if (a === 'copy') { S.data.touched = true; return copyId(b); }
     if (a === 'pick') { S.data[b.getAttribute('data-k')] = v; paintPane(); return; }
     if (a === 'upi-pay') return upiPay();
     if (a === 'upi-paid') return upiPaid();
+    if (a === 'upi-noutr') return finish({ method: 'upi', paymentId: 'UPI paid, no UTR', label: 'UPI' });
     if (a === 'card-pay') return cardPay(S.method === 'emi' ? 'emi' : 'card');
     if (a === 'cod-go') return finish({ method: 'cod', paymentId: 'COD', label: 'Cash on delivery' });
-    if (a === 'nb-go') return redirectTo('bank', 'netbanking', 'NB', S.data.bank, monoOf(BANKS_TOP, S.data.bank), [['Bank', S.data.bank]], 'bank');
     if (a === 'wallet-go') { var w = WALLETS.filter(function (x) { return x[0] === S.data.wallet; })[0]; return redirectTo('wallet', 'wallet', 'WALLET', S.data.wallet, w ? w[1] : 'W', [['Wallet balance', money(Math.max(2500, Math.ceil(S.amount / 500) * 500 + 1200))]], 'wallet'); }
     if (a === 'later-go') { var l = LATER.filter(function (x) { return x[0] === S.data.later; })[0]; return redirectTo('later', 'paylater', 'LATER', S.data.later, l ? l[1] : 'PL', [['Credit limit', money(Math.max(5000, Math.ceil(S.amount / 1000) * 1000 + 2000))], ['Pay by', l ? l[2] : 'Next month']], 'pay later'); }
     if (a === 'emi-bank') { S.data.emi.bank = v; paintPane(); return; }
@@ -343,8 +365,7 @@
     if (a === 'cancelreq') return fail('The payment request was cancelled.', 'Request cancelled');
     if (a === 'otp-go') return otpGo();
   }
-  function monoOf(list, name) { var m = list.filter(function (x) { return x[0] === name; })[0]; return m ? m[1] : String(name || '').replace(/[^A-Z]/g, '').slice(0, 4) || 'BK'; }
-  function redirectTo(key, method, code, name, mono, lines, kind) {
+    function redirectTo(key, method, code, name, mono, lines, kind) {
     if (!name) return;
     busy('Taking you to ' + name, 'Please wait while we open the ' + kind + ' page.', function () {
       setScreen({ t: 'approve', name: name, mono: mono, lines: lines, kind: kind, done: function () { finish({ method: method, paymentId: 'DEMO-' + code + '-' + String(name).replace(/[^A-Za-z]/g, '').slice(0, 6).toUpperCase() + '-' + rand(4), label: 'Test payment' }); } });
@@ -371,6 +392,15 @@
     el.textContent = Math.floor(left / 60) + ':' + ('0' + (left % 60)).slice(-2);
     return left > 0;
   }
+  /** Copies the UPI ID. If the browser refuses, select the text so the person can copy it themselves, and say so. */
+  function copyId(btn) {
+    var said = function (t) { btn.textContent = t; setTimeout(function () { if (btn.isConnected) btn.textContent = 'Copy'; }, 2000); };
+    var pickText = function () { var code = $('.vp-id code', S.root); if (code && window.getSelection) { var r = document.createRange(); r.selectNodeContents(code); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); } said('Press and hold to copy'); };
+    var legacy = function () {
+      try { var ta = document.createElement('textarea'); ta.value = UPI_ID; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0'; S.root.appendChild(ta); ta.select(); var okc = document.execCommand('copy'); ta.parentNode.removeChild(ta); btn.focus({ preventScroll: true }); okc ? said('Copied') : pickText(); } catch (e) { pickText(); }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(UPI_ID).then(function () { said('Copied'); }, legacy); else legacy();
+  }
   function upiPaid() {
     var u = String(S.data.f.utr || '').replace(/\s/g, '');
     if (!/^\d{12}$/.test(u)) { S.data.errs = { utr: 'The UPI reference is 12 digits. You find it in your UPI app.' }; paintPane(); var i = $('#vp-utr', S.root); if (i) i.focus(); return; }
@@ -387,13 +417,12 @@
   var FIELD = { 'vp-cn': 'cn', 'vp-nm': 'nm', 'vp-ex': 'ex', 'vp-cv': 'cv', 'vp-vpa': 'vpa', 'vp-utr': 'utr' };
   function onInput(e) {
     var t = e.target, id = t.id; if (!S) return;
-    if (id === 'vp-more') { S.data[t.getAttribute('data-k')] = t.value; paintPane(); return; }
     if (id === 'vp-cn') { var d = t.value.replace(/\D/g, ''); t.value = fmtCard(d); S.data.f.cn = t.value; var br = $('[data-brand]', S.root); if (br) br.textContent = brandOf(d); }
     else if (id === 'vp-ex') { var x = t.value.replace(/\D/g, '').slice(0, 4); if (x.length >= 3) x = x.slice(0, 2) + '/' + x.slice(2); else if (x.length === 2 && e.inputType !== 'deleteContentBackward') x += '/'; t.value = x; S.data.f.ex = x; }
     else if (id === 'vp-cv') { t.value = t.value.replace(/\D/g, '').slice(0, 4); S.data.f.cv = t.value; }
     else if (id === 'vp-nm') S.data.f.nm = t.value;
     else if (id === 'vp-vpa') S.data.f.vpa = t.value.trim();
-    else if (id === 'vp-utr') { t.value = t.value.replace(/\D/g, '').slice(0, 12); S.data.f.utr = t.value; }
+    else if (id === 'vp-utr') { t.value = t.value.replace(/\D/g, '').slice(0, 12); S.data.f.utr = t.value; S.data.touched = true; }
     else if (id === 'vp-otp') t.value = t.value.replace(/\D/g, '').slice(0, 6);
     var fk = FIELD[id];
     if (fk && S.data.errs && S.data.errs[fk]) { // the person is fixing it: drop the message
@@ -402,7 +431,7 @@
     }
   }
   function onKey(e) {
-    if (e.key === 'Escape') { if (!S.busy) { e.preventDefault(); close(false); } return; }
+    if (e.key === 'Escape') { if (!S.busy) { e.preventDefault(); requestClose(); } return; }
     if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
       var id = e.target.id, map = { 'vp-vpa': 'upi-pay', 'vp-utr': 'upi-paid', 'vp-otp': 'otp-go', 'vp-cn': 'card-pay', 'vp-nm': 'card-pay', 'vp-ex': 'card-pay', 'vp-cv': 'card-pay' };
       if (map[id]) { e.preventDefault(); var btn = $('[data-a="' + map[id] + '"]', S.root); if (btn && !btn.disabled) btn.click(); }
@@ -425,9 +454,10 @@
     open: open,
     demo: DEMO,
     /** A short line for under the pay button. */
-    note: function (amount) {
+    note: function () {
       if (DEMO) return 'Test mode: the payment window is a demo. No real money is charged.';
-      return UPI_ID ? 'Pay with UPI or cash on delivery. Cards, netbanking and wallets are coming soon.' : 'Pay cash on delivery. Online payment is coming soon.';
+      var names = methods().filter(function (m) { return m.ok; }).map(function (m) { return m.id === 'upi' ? 'UPI (Google Pay, PhonePe, Paytm or any UPI app)' : m.t; });
+      return 'Pay securely with ' + (names.length > 1 ? names.slice(0, -1).join(', ') + ' or ' + names[names.length - 1] : names[0]) + '.';
     }
   };
 })();
