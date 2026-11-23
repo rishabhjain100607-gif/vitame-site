@@ -1,16 +1,12 @@
-/* Vitame AutoPay: a window that sends an AutoPay (UPI mandate) request to Google Pay for a subscription box.
+/* Vitame "pay your next box": a window that opens a UPI payment for a subscription box, with the amount and the shop's UPI ID filled in.
  *
- * What it does: the customer picks how often (weekly, every 2 weeks, every 4 weeks), then opens Google Pay (phone) or scans a QR code (computer).
- * Google Pay shows the amount and rhythm and the customer approves with their UPI PIN. It looks like the payment window (pay.css).
- *
- * What it cannot do on its own: a UPI mandate is created and charged through the shop's bank or payment partner. This site has no
- * payment partner connected (no API keys), so the link below follows NPCI's public UPI link format, but it has not been tested with
- * a live Google Pay account and the app may refuse it for a personal UPI ID. For that case the window always offers a plain
- * "pay this box now" UPI link and tells the customer plainly what to expect. Nothing here ever says money was taken.
+ * Phones get a Google Pay button (and a button for any other UPI app); computers get a QR code to scan. The link is an ordinary UPI
+ * payment link (upi://pay), valid for any UPI ID. Real automatic debit (UPI AutoPay) needs a payment partner such as Razorpay, which
+ * this site does not have; Google Pay refuses AutoPay links for a personal UPI ID, so none is offered here.
  *
  * Settings: window.PP.pay.upiId and .payee (the same ones the payment window uses).
  *
- * VitameAutopay.open({ sub: {id, token}, amount, freq: 'weekly'|'fortnight'|'monthly', canChangeFreq, onFreq(sub), onClose() })
+ * VitameAutopay.open({ sub: {id, token}, amount, freq, nextLabel, canChangeFreq, onFreq(sub), onClose({saved}) })
  * VitameAutopay.saved(id) -> {freq, amount, at} or null   VitameAutopay.available() -> true when a UPI ID is set
  */
 (function () {
@@ -27,11 +23,11 @@
   var KEY = 'pp-autopay';
   var GPAY_ANDROID = 'com.google.android.apps.nbu.paisa.user';
 
-  // rhythm -> label, days, and the NPCI recurrence name. Every 4 weeks is not a calendar month, so it is "as presented".
+  // the three rhythms the subscription page offers
   var FREQS = [
-    { id: 'weekly', label: 'Every week', short: 'every week', days: 7, recur: 'WEEKLY' },
-    { id: 'fortnight', label: 'Every 2 weeks', short: 'every 2 weeks', days: 14, recur: 'FORTNIGHTLY' },
-    { id: 'monthly', label: 'Every 4 weeks', short: 'every 4 weeks', days: 28, recur: 'ASPRESENTED' }
+    { id: 'weekly', label: 'Every week', short: 'every week', days: 7 },
+    { id: 'fortnight', label: 'Every 2 weeks', short: 'every 2 weeks', days: 14 },
+    { id: 'monthly', label: 'Every 4 weeks', short: 'every 4 weeks', days: 28 }
   ];
   var freqOf = function (id) { return FREQS.filter(function (f) { return f.id === id; })[0] || FREQS[1]; };
 
@@ -45,25 +41,13 @@
   function saved(id) { var r = LS.get()[id]; return r && typeof r === 'object' ? r : null; }
 
   /* ---------------------------------------------------------------- the link */
-  function ist(offsetDays) { return new Date(Date.now() + 19800000 + (offsetDays || 0) * 86400000); } // India time
-  function ddmmyyyy(d) { var p = function (n) { return ('0' + n).slice(-2); }; return p(d.getUTCDate()) + p(d.getUTCMonth() + 1) + d.getUTCFullYear(); }
-
-  /** The mandate part of the link, in NPCI's UPI link format. One place to adjust if a payment partner needs other fields. */
-  function mandateParams() {
-    var enc = encodeURIComponent, f = freqOf(S.freq), id = S.sub && S.sub.id ? S.sub.id : '';
-    var tr = ('VITAP' + id.replace(/\D/g, '') + Date.now().toString(36)).toUpperCase().slice(0, 35);
-    return 'pa=' + enc(UPI_ID) + '&pn=' + enc(PAYEE) + '&tr=' + enc(tr) + '&am=' + S.amount.toFixed(2) + '&cu=INR' +
-      '&tn=' + enc('Vitame ' + (id || 'subscription') + ' AutoPay') +
-      '&txnType=CREATE&recur=' + f.recur + '&amrule=MAX&orgid=000000' +
-      '&validitystart=' + ddmmyyyy(ist(0)) + '&validityend=' + ddmmyyyy(ist(365));
-  }
   function payParams() { // an ordinary one-off UPI payment, the same fields the checkout window uses
     var enc = encodeURIComponent;
     return 'pa=' + enc(UPI_ID) + '&pn=' + enc(PAYEE) + '&am=' + S.amount.toFixed(2) + '&cu=INR&tn=' + enc('Vitame ' + (S.sub && S.sub.id ? S.sub.id : 'subscription box'));
   }
-  function gpayLink(kind, params) { // kind: 'mandate' | 'pay'
+  function gpayLink(kind, params) { // kind: 'pay'
     if (IOS) return 'gpay://upi/' + kind + '?' + params;
-    if (ANDROID) return 'intent://' + (kind === 'pay' ? 'pay' : kind) + '?' + params + '#Intent;scheme=upi;package=' + GPAY_ANDROID + ';end';
+    if (ANDROID) return 'intent://' + kind + '?' + params + '#Intent;scheme=upi;package=' + GPAY_ANDROID + ';end';
     return 'tez://upi/' + kind + '?' + params;
   }
   function qrSvg(text) {
@@ -76,8 +60,7 @@
 
   /* ---------------------------------------------------------------- window */
   var S = null;
-  // Off unless window.PP.pay.autopay === true: UPI AutoPay links are refused for a personal UPI ID, so it needs a payment partner first.
-  function available() { return !!UPI_ID && P.autopay === true; }
+  function available() { return !!UPI_ID; }
 
   function open(o) {
     if (S) return;
@@ -86,10 +69,10 @@
     var root = document.createElement('div');
     root.className = 'vp-veil vp-solo vp-ap';
     root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'ap-title');
-    root.innerHTML = '<div class="vp"><header class="vp-h"><img src="./media/vitame-cream.webp" alt="Vitame" width="111" height="30"><span class="vp-sec">AutoPay</span>' +
-      '<div class="vp-amt"><small>Each box</small><b data-ap-amt></b></div><button class="vp-x" type="button" data-a="close" aria-label="Close AutoPay window">&times;</button></header>' +
+    root.innerHTML = '<div class="vp"><header class="vp-h"><img src="./media/vitame-cream.webp" alt="Vitame" width="111" height="30"><span class="vp-sec">Next box</span>' +
+      '<div class="vp-amt"><small>This box</small><b data-ap-amt></b></div><button class="vp-x" type="button" data-a="close" aria-label="Close window">&times;</button></header>' +
       '<div class="vp-body"><section class="vp-pane" data-pane tabindex="-1"></section></div>' +
-      '<footer class="vp-foot">We never see your bank details. You can pause or stop AutoPay any time in your UPI app.</footer></div>';
+      '<footer class="vp-foot">We never see your bank details. Your payment goes straight to Vitame by UPI.</footer></div>';
     document.body.appendChild(root);
     document.documentElement.classList.add('vp-lock');
     S.root = root;
@@ -127,33 +110,24 @@
   }
 
   function mainHtml() {
-    var f = freqOf(S.freq), mand = mandateParams();
-    var link = gpayLink('mandate', mand), generic = 'upi://mandate?' + mand;
+    var f = freqOf(S.freq), pay = payParams();
     var start = MOBILE
-      ? '<div class="vp-apps ap-apps"><a class="vp-btn full" data-a="opened" href="' + esc(link) + '">Open Google Pay</a>' +
-        '<a class="vp-btn sec full" data-a="opened" href="' + esc(generic) + '">Another UPI app</a></div>' +
-        '<p class="vp-hint">Google Pay opens with the amount and how often already filled in. You approve it with your UPI PIN.</p>'
-      : '<div class="vp-qr"><div data-qr>' + qrSvg(generic) + '</div><div><p><b>Scan with your phone</b></p><p class="vp-hint" style="margin:0">Use the Google Pay app (Scan any QR) or your phone camera. Google Pay then asks you to approve ' + esc(money(S.amount)) + ' ' + esc(f.short) + '.</p></div></div>';
-    var now = '<details class="ap-more"><summary>Google Pay says it cannot set this up?</summary><div>' +
-      '<p>Some banks and apps do not accept AutoPay requests yet. Nothing is lost: we email you before every box, and you can pay each one yourself with UPI.</p>' +
-      (MOBILE ? '<a class="vp-btn sec sm" data-a="opened" href="' + esc(gpayLink('pay', payParams())) + '">Pay ' + esc(money(S.amount)) + ' now in Google Pay</a>'
-        : '<p class="vp-hint" style="margin:0 0 6px">Or send ' + esc(money(S.amount)) + ' to this UPI ID from any UPI app:</p><div class="vp-id"><code>' + esc(UPI_ID) + '</code><button class="vp-chip" type="button" data-a="copy">Copy</button></div>') +
-      '</div></details>';
-    return '<h2 id="ap-title" tabindex="-1">Set up AutoPay</h2>' +
-      '<p class="vp-lede">Send Google Pay an AutoPay request for your box, ' + esc(f.short) + '. Approve it once and you stay in control: pause or stop it whenever you like.</p>' +
-      '<div class="vp-step"><i>1</i><div><b>How often?</b><div style="margin-top:8px">' + chipsHtml() + '</div></div></div>' +
-      '<div class="ap-sum"><span>' + esc(money(S.amount)) + ' <small>at most, ' + esc(f.short) + '</small></span><small>Valid for 1 year. You can stop it any time.</small></div>' +
-      '<div class="vp-step"><i>2</i><div><b>' + (MOBILE ? 'Open Google Pay' : 'Scan to open Google Pay') + '</b><div style="margin-top:10px">' + start + '</div></div></div>' +
-      '<div class="vp-step"><i>3</i><div><b>Approved it?</b><div style="margin-top:10px"><button class="vp-btn full" type="button" data-a="done">I have set up AutoPay</button></div><p class="vp-hint">This only tells us you did it. We confirm when the first payment arrives.</p></div></div>' +
-      now;
+      ? '<div class="vp-apps ap-apps"><a class="vp-btn full" data-a="opened" href="' + esc(gpayLink('pay', pay)) + '">Pay ' + esc(money(S.amount)) + ' in Google Pay</a>' +
+        '<a class="vp-btn sec full" data-a="opened" href="upi://pay?' + esc(pay) + '">Another UPI app</a></div>' +
+        '<p class="vp-hint">The app opens with the amount and our UPI ID already filled in. You approve it with your UPI PIN.</p>'
+      : '<div class="vp-qr"><div data-qr>' + qrSvg('upi://pay?' + pay) + '</div><div><p><b>Scan with your phone</b></p><p class="vp-hint" style="margin:0 0 8px">Use the Google Pay app (Scan any QR) or your phone camera. Pay <b>' + esc(money(S.amount)) + '</b> to <b>' + esc(PAYEE) + '</b>.</p><p class="vp-hint" style="margin:0">Or send it to this UPI ID:</p><div class="vp-id"><code>' + esc(UPI_ID) + '</code><button class="vp-chip" type="button" data-a="copy">Copy</button></div></div></div>';
+    return '<h2 id="ap-title" tabindex="-1">Pay for your next box</h2>' +
+      '<p class="vp-lede">Pay in one tap with any UPI app' + (S.o.nextLabel ? ', for the box arriving ' + esc(S.o.nextLabel) : '') + '. We email you before every box so you never forget.</p>' +
+      '<div class="vp-step"><i>1</i><div><b>How often do you want your boxes?</b><div style="margin-top:8px">' + chipsHtml() + '</div></div></div>' +
+      '<div class="ap-sum"><span>' + esc(money(S.amount)) + ' <small>for this box, ' + esc(f.short) + '</small></span><small>Delivery and your subscriber saving are already included.</small></div>' +
+      '<div class="vp-step"><i>2</i><div><b>' + (MOBILE ? 'Open your UPI app' : 'Scan to pay') + '</b><div style="margin-top:10px">' + start + '</div></div></div>' +
+      '<div class="vp-step"><i>3</i><div><b>Paid?</b><div style="margin-top:10px"><button class="vp-btn full" type="button" data-a="done">I have paid ' + esc(money(S.amount)) + '</button></div><p class="vp-hint">We match your payment by the note ' + esc(S.sub && S.sub.id ? S.sub.id : 'on it') + ' and check it against our bank account.</p></div></div>';
   }
 
   function doneHtml() {
-    var f = freqOf(S.freq);
     return '<div class="vp-c"><svg class="vp-tick" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="38"/><path d="M25 43l11 11 23-25"/></svg>' +
-      '<h2 id="ap-title" tabindex="-1">AutoPay noted</h2>' +
-      '<p>Thank you. We have noted AutoPay for ' + esc(money(S.amount)) + ' ' + esc(f.short) + (S.sub && S.sub.id ? ' on ' + esc(S.sub.id) : '') + '. You find it in Google Pay under Autopay, where you can pause or cancel it any time.</p>' +
-      '<p class="vp-hint">If Google Pay did not ask you to approve anything, no AutoPay is active. We still email you before every box so you can pay it yourself.</p>' +
+      '<h2 id="ap-title" tabindex="-1">Thank you</h2>' +
+      '<p>We have noted your ' + esc(money(S.amount)) + ' payment' + (S.sub && S.sub.id ? ' for ' + esc(S.sub.id) : '') + '. We check it against our bank account and keep your box on schedule.</p>' +
       '<div class="vp-acts"><button class="vp-btn" type="button" data-a="close">Close</button></div></div>';
   }
 
