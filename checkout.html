@@ -182,6 +182,7 @@
 
   <script src="./assets/vendor/qrcode.min.js"></script>
   <script src="./assets/pay.js"></script>
+  <script src="./assets/autopay.js"></script>
   <script>
   (function(){
     // ===== Razorpay config. Paste your Razorpay Key ID (rzp_test_... or rzp_live_...) here. It is a public key. =====
@@ -303,6 +304,13 @@
         try{var ss=JSON.parse(localStorage.getItem('pp-subs')||'[]');res.subs.forEach(function(x){if(!ss.some(function(y){return y.id===x.id}))ss.push(x)});localStorage.setItem('pp-subs',JSON.stringify(ss))}catch(e){}
         $('[data-done-msg]').textContent+=' Your subscription is set up too: we remind you before each delivery, and you can skip, pause or swap flavours any time from My subscriptions.';
         var ma=document.createElement('a');ma.className='pill solid';ma.href='./subscriptions.html';ma.textContent='Manage my subscription';ma.style.marginLeft='10px';tl.parentNode.insertBefore(ma,tl.nextSibling);
+        var AP=window.VitameAutopay,subItems=cart.filter(function(i){return i.sub});
+        if(AP&&AP.available()&&res.subs.length===1&&subItems.length===1){ // one subscription: offer AutoPay right here, same rhythm they chose
+          var it=subItems[0],ab=document.createElement('button');ab.type='button';ab.className='pill';ab.textContent='Set up AutoPay';ab.style.marginLeft='10px';
+          ab.addEventListener('click',function(){AP.open({sub:res.subs[0],amount:Math.round((subPrice(it.unit)*it.qty+(order.ship==='premium'?PREMIUM_FEE:0))*100)/100,freq:it.freq||'fortnight',canChangeFreq:true,onClose:function(c){if(c.saved)ab.textContent='AutoPay noted'}})});
+          ma.parentNode.insertBefore(ab,ma.nextSibling);
+          $('[data-done-msg]').textContent+=' You can also set up AutoPay in Google Pay so each box is paid for you.';
+        }
       }
       window.scrollTo(0,0);
     }

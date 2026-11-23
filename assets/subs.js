@@ -95,6 +95,8 @@ function historyHtml(s) {
   if (!rows.length) return "";
   return `<details class="sb-hist"><summary>Past deliveries <b>${rows.length}</b></summary><ul>${rows.map((o) => `<li><a href="./orders.html#${esc(o.id)}"><span>${esc(o.id)}</span><span>${o.at ? fd(new Date(o.at + 19800000).toISOString().slice(0, 10)) : ""}</span><em class="st-mini ${/Delivered/.test(o.status) ? "ok" : /Cancel/.test(o.status) ? "bad" : ""}">${esc(o.status || "Placed")}</em></a></li>`).join("")}</ul></details>`;
 }
+const apOn = () => !!(window.VitameAutopay && window.VitameAutopay.available());
+const apNote = (s) => { const r = apOn() && window.VitameAutopay.saved(s.id); return r && r.at ? `<p class="sb-note">You told us you set up AutoPay on <b>${esc(fd(new Date(r.at + 19800000).toISOString().slice(0, 10)))}</b>. Manage it in Google Pay under Autopay.</p>` : ""; };
 function cardHtml(s, i) {
   const active = s.status === "Active", paused = s.status === "Paused", gone = s.status === "Cancelled";
   const left = s.daysToNext;
@@ -108,7 +110,7 @@ function cardHtml(s, i) {
   const feeTxt = s.ship === "Premium" ? `+ ${money(s.fee)} premium delivery` : "Free delivery";
   const btn = (act, label, cls = "", dis = false) => `<button type="button" class="sb-btn ${cls}" data-act="${act}" data-id="${esc(s.id)}"${dis ? " disabled" : ""}>${label}</button>`;
   let acts = "";
-  if (active) acts = btn("skip", "Skip next", "", !s.canChange) + btn("mix", "Change box", "", !s.canChange) + btn("next", "Change date", "", !s.canChange) + btn("freq", "Rhythm") + btn("pause", "Pause") + btn("details", "Delivery details") + btn("cancel", "Cancel", "is-quiet");
+  if (active) acts = btn("skip", "Skip next", "", !s.canChange) + btn("mix", "Change box", "", !s.canChange) + btn("next", "Change date", "", !s.canChange) + btn("freq", "Rhythm") + btn("pause", "Pause") + (apOn() ? btn("autopay", "AutoPay") : "") + btn("details", "Delivery details") + btn("cancel", "Cancel", "is-quiet");
   else if (paused) acts = btn("resume", "Resume", "is-pri") + btn("mix", "Change box") + btn("freq", "Rhythm") + btn("details", "Delivery details") + btn("cancel", "Cancel", "is-quiet");
   else acts = `<a class="pill solid" href="#" data-auth data-go="./subscribe.html" data-plain>Start a new subscription</a>`;
   return `<article class="sb ${STATUS[s.status] || ""}" data-sub="${esc(s.id)}" data-reveal data-reveal-delay="${Math.min(i, 5) * 0.06}">
@@ -117,7 +119,7 @@ function cardHtml(s, i) {
     ${s.boxes > 1 ? `<p class="sb-boxes">${s.boxes} boxes of ${s.size} bottles each delivery</p>` : `<p class="sb-boxes">${s.size}-bottle box</p>`}
     ${gone ? "" : `<div class="sb-next"><small>${paused ? "Restarts" : "Next delivery"}</small><b>${esc(paused ? (s.resume ? fd(s.resume) : "When you resume") : fd(s.next))}</b>${active && left != null ? `<span class="sb-in">${esc(fromNow(left))}</span>` : ""}</div>`}
     <dl class="sb-meta"><div><dt>Rhythm</dt><dd>${esc(s.freqLabel.replace(/^./, (c) => c.toUpperCase()))}</dd></div><div><dt>Per delivery</dt><dd>${money(s.price)}</dd><small>${esc(feeTxt)}</small></div><div><dt>Delivered</dt><dd>${s.done}${s.skipped ? ` <small>(${s.skipped} skipped)</small>` : ""}</dd></div></dl>
-    ${alert}${note}
+    ${alert}${note}${active || paused ? apNote(s) : ""}
     <div class="sb-acts">${acts}</div>
     ${historyHtml(s)}
   </article>`;
@@ -249,6 +251,11 @@ const ACTIONS = {
         paint();
         return () => (total() !== cur.size ? null : { op: "mix", mix: { ...cur.c }, boxes: cur.boxes });
       } });
+  },
+  autopay(s) {
+    const AP = window.VitameAutopay;
+    if (!AP || !AP.available()) return toast("AutoPay is not available right now.", true);
+    AP.open({ sub: { id: s.id, token: tokenOf(s.id) }, amount: s.total || s.price, freq: s.freq, canChangeFreq: s.status === "Active", onFreq: (u) => { const i = u ? state.subs.findIndex((x) => x.id === u.id) : -1; if (i >= 0) { state.subs[i] = u; render(); } }, onClose: (c) => { if (c.saved) render(); } });
   },
   details(s) {
     openModal({ sub_id: s.id, title: "Delivery details", sub: "Used for every box from now on.", ok: "Save details", after: () => "Details saved.",
