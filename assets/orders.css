@@ -137,6 +137,7 @@
 .od-step b{display:block;font-size:1.02rem;line-height:1.2}
 .od-step small{display:block;opacity:.7;margin-top:2px}
 .od-step time{display:block;font:700 .75rem var(--font-price);margin-top:4px;opacity:.8}
+.od-step small.od-where{opacity:1;font-weight:700;color:var(--ink);margin-top:4px}
 @keyframes od-pulse2{0%{box-shadow:0 0 0 0 rgba(255,138,42,.55)}70%{box-shadow:0 0 0 12px rgba(255,138,42,0)}100%{box-shadow:0 0 0 0 rgba(255,138,42,0)}}
 
 /* summary / receipt */

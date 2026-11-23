@@ -332,6 +332,11 @@ function mkEl(cls, inner, label) {
 /** Mapbox sets its own transform on a marker element, so the styled pin goes inside a plain wrapper. */
 function wrapMk(inner) { const w = document.createElement("div"); w.appendChild(inner); return w; }
 
+/** The pin the shop (or the courier's phone) last set for this order, if any. */
+const hasLoc = (o) => !!(o && o.loc && o.loc.lat != null && o.loc.lng != null && o.loc.lat !== "" && o.loc.lng !== "" && isFinite(Number(o.loc.lat)) && isFinite(Number(o.loc.lng)));
+const whereLabel = (o) => (hasLoc(o) && o.loc.label ? String(o.loc.label) : "");
+const sinceTxt = (sec) => (sec < 60 ? "just now" : sec < 3600 ? `${Math.round(sec / 60)} min ago` : sec < 86400 ? `${Math.round(sec / 3600)} h ago` : `${Math.round(sec / 86400)} d ago`);
+
 class Tracker {
   constructor(root, order) {
     this.root = root; this.order = order; this.wh = state.warehouse; this.dest = order.dest;
@@ -411,8 +416,7 @@ class Tracker {
 
   position(o, wh) {
     const w = wh && wh.lat != null ? { lat: wh.lat, lng: wh.lng } : null;
-    if (o.status === "Placed" || o.status === "Packed") return w || (o.loc ? { lat: o.loc.lat, lng: o.loc.lng } : null);
-    return o.loc ? { lat: o.loc.lat, lng: o.loc.lng } : w;
+    return hasLoc(o) ? { lat: Number(o.loc.lat), lng: Number(o.loc.lng) } : w;
   }
 
   async update(order, wh) {
@@ -481,15 +485,17 @@ class Tracker {
     const straight = haversine(here, this.dest);
     const meters = this.route ? this.route.dist : straight;
     const d = fmtDist(meters);
-    $("[data-h-label]", root).textContent = out ? "Distance to you" : "Warehouse to you";
+    const where = whereLabel(o);
+    $("[data-h-label]", root).textContent = out || where ? "Distance to you" : "Warehouse to you";
     $("[data-h-unit]", root).textContent = d.u;
     const target = d.n;
     if (reduce) $("[data-h-num]", root).textContent = target;
     else gsap.to(this.shown, { v: target, duration: 1, ease: "power2.out", onUpdate: () => { $("[data-h-num]", root).textContent = d.u === "km" ? this.shown.v.toFixed(1) : Math.round(this.shown.v); } });
     const eta = $("[data-h-eta]", root);
-    if (out && this.route) eta.textContent = `About ${Math.max(1, Math.round(this.route.dur / 60))} min away`;
-    else if (out) eta.textContent = "On its way";
-    else eta.textContent = o.status === "Packed" ? "Packed and waiting for pick up" : "Being packed";
+    const at = where ? `Now at ${where}` : "";
+    if (out && this.route) eta.textContent = `${at ? at + " · " : ""}About ${Math.max(1, Math.round(this.route.dur / 60))} min away`;
+    else if (out) eta.textContent = at ? `${at} · On its way` : "On its way";
+    else eta.textContent = at || (o.status === "Packed" ? "Packed and waiting for pick up" : "Being packed");
     if (!this.route) this.note(this.mode === "strip" ? $("[data-h-note]", root).textContent : "Distance shown in a straight line for now.");
     else if (this.mode === "map") this.note("");
     this.paintAge();
@@ -506,13 +512,15 @@ class Tracker {
     const out = this.order.status === "Out for delivery";
     $(".mk-order", s).classList.toggle("is-still", !out);
     const d = fmtDist(this.route ? this.route.dist : left);
-    $("[data-s-text]", s).textContent = out ? `Your order is ${d.n} ${d.u} from you.` : "Your order is getting ready at our warehouse.";
+    $("[data-s-text]", s).textContent = out ? `Your order is ${d.n} ${d.u} from you.` : whereLabel(this.order) ? `Your order is at ${whereLabel(this.order)}.` : "Your order is getting ready at our warehouse.";
   }
 
   paintAge() {
     const live = $("[data-h-live]", this.root), t = $("[data-h-live-t]", this.root);
     if (!live) return;
     const o = this.order;
+    const shop = hasLoc(o) && o.loc.src === "admin" && o.loc.at;
+    if (shop) { live.classList.remove("off"); t.textContent = `Updated ${sinceTxt(Math.max(0, Math.round((Date.now() + state.skew - o.loc.at) / 1000)))}`; return; }
     if (o.status !== "Out for delivery") { live.classList.add("off"); t.textContent = o.status === "Packed" ? "Packed" : "Preparing"; return; }
     if (!o.loc || !o.loc.at) { live.classList.add("off"); t.textContent = "Waiting for courier"; return; }
     const age = Math.max(0, Math.round((Date.now() + state.skew - o.loc.at) / 1000));
@@ -541,7 +549,8 @@ function stepperHtml(o) {
   return `<ol class="od-steps">${STEPS.map((s, n) => {
     const cls = n < idx ? "is-done" : n === idx ? (o.status === "Delivered" ? "is-done" : "now") : "pending";
     const time = s.k === "Placed" ? fTime(o.placedAt) : s.k === "Delivered" ? fTime(o.deliveredAt) : "";
-    return `<li class="od-step ${cls}"><span class="od-dot">${cls === "is-done" ? "&#10003;" : n + 1}</span><div><b>${s.t}</b><small>${s.d}</small>${time ? `<time>${time}</time>` : ""}</div></li>`;
+    const where = cls === "now" ? whereLabel(o) : "";
+    return `<li class="od-step ${cls}"><span class="od-dot">${cls === "is-done" ? "&#10003;" : n + 1}</span><div><b>${s.t}</b><small>${s.d}</small>${where ? `<small class="od-where">Now at ${esc(where)}</small>` : ""}${time ? `<time>${time}</time>` : ""}</div></li>`;
   }).join("")}</ol>`;
 }
 

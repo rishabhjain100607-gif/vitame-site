@@ -302,3 +302,16 @@ td .sm{display:block;font-size:.74rem;color:var(--mut)}
 @media(max-width:1024px){.ap{bottom:92px}.ap-launch{width:76px;height:76px}.ap-panel{bottom:88px;height:min(560px,calc(100vh - 210px))}.ap-bubble{right:84px}}
 @media(max-width:560px){.ap-panel{position:fixed;left:10px;right:10px;bottom:96px;width:auto}}
 @media(prefers-reduced-motion:reduce){.ap-fig,.ap-launch.wave .p-hand-l{animation:none}}
+
+/* order drawer: location for each step */
+.lp-now{margin:0 0 10px;font-size:.84rem;color:var(--mut)}
+.lp-now b{color:var(--ink)}
+.lp{margin-top:12px;background:#fff4de}
+.lp .chips{flex-wrap:wrap;border-radius:20px;margin:12px 0 0}
+.lp .chips button{padding:.4em .85em}
+.lp .fld label{font:700 .68rem var(--fp);letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.lp-res{display:grid;gap:6px;margin-top:8px}
+.lp-res button{text-align:left;border:2px solid var(--ink);border-radius:12px;background:var(--paper);padding:8px 12px;font:600 .82rem/1.3 var(--ft);transition:background .2s,transform .2s}
+.lp-res button:hover{background:var(--lemon);transform:translate(-1px,-1px)}
+.lp .sub{font-size:.84rem;color:var(--mut);line-height:1.4}
+.lp .fld{margin-top:10px}

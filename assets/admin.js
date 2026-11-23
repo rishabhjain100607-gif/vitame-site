@@ -313,7 +313,8 @@
           if (b.rev && b.rev === DB.rev) return res({ ok: true, unchanged: true, rev: DB.rev });
           return res({ ok: true, rev: DB.rev, serverTime: Date.now(), orders: DB.orders.slice(), subs: DB.subs.map(demoSub), stock: DB.stock.map(function (s) { return Object.assign({}, s); }), board: DB.board, chats: DB.chats, warehouse: { name: 'Vitame Warehouse', address: 'Vijay Nagar, Indore, Madhya Pradesh', lat: 22.75, lng: 75.89 }, statuses: K.STATUS, version: 'demo', orderSeq: DB.seq, links: { orders: '#', stock: '#', board: '#' } });
         }
-        if (action === 'admin_status') { DB.orders.forEach(function (o) { if (o.id === b.id) { o.status = b.status; if (b.status === 'Delivered') o.deliveredAt = Date.now(); } }); DB.rev = String(Date.now()); return res({ ok: true }); }
+        if (action === 'admin_status') { DB.orders.forEach(function (o) { if (o.id === b.id) { o.status = b.status; if (b.courier) o.courier = b.courier; if (b.lat != null && b.lng != null) o.loc = { lat: b.lat, lng: b.lng, label: b.locLabel || '', at: Date.now(), src: 'admin' }; if (b.status === 'Delivered') o.deliveredAt = Date.now(); } }); DB.rev = String(Date.now()); return res({ ok: true, mail: b.status === 'Out for delivery' ? 'sent' : undefined }); }
+        if (action === 'admin_location') { var lo = DB.orders.filter(function (o) { return o.id === b.id; })[0]; if (!lo) return res({ ok: false, error: 'Order not found.' }); lo.loc = { lat: b.lat, lng: b.lng, label: b.locLabel || '', at: Date.now(), src: 'admin' }; DB.rev = String(Date.now()); return res({ ok: true }); }
         if (action === 'admin_stock') { DB.stock.forEach(function (s) { if (s.id === b.id) { s.qty = b.qty; s.backAt = b.backAt || ''; s.status = b.qty > 0 ? 'In stock' : 'Out of stock'; } }); DB.rev = String(Date.now()); return res({ ok: true }); }
         res({ ok: false, error: 'demo' });
       }, 120);
@@ -713,16 +714,17 @@
     var steps = ['Placed', 'Packed', 'Out for delivery', 'Delivered'], idx = steps.indexOf(o.status), canc = o.status === 'Cancelled';
     h = '<div class="dh"><div><small style="font:700 .66rem var(--fp);letter-spacing:.14em;text-transform:uppercase;opacity:.7">Order</small><h2>' + esc(o.id) + '</h2></div><span class="sp"></span>' + stChip(o.status) + '<button class="x" type="button" data-close aria-label="Close">×</button></div><div class="db">';
     h += '<div class="box"><h4>Progress</h4>' + (canc ? '<p style="margin:0"><b>This order was cancelled.</b></p>' : '<div class="tl">' + steps.map(function (s, i) { return '<div class="s ' + (i < idx || o.status === 'Delivered' ? 'done' : i === idx ? 'now' : '') + '"><i></i>' + (s === 'Out for delivery' ? 'On the road' : s) + '<small>' + (i === 0 ? K.fmtTime(o.placedAt) : i === 3 && o.deliveredAt ? K.fmtDate(o.deliveredAt) : '') + '</small></div>'; }).join('') + '</div>') + '</div>';
-    h += '<div class="box"><h4>Move this order</h4><div class="acts" id="st-acts">' + K.STATUS.filter(function (s) { return s !== o.status; }).map(function (s) { return '<button class="btn sm ' + (s === 'Cancelled' ? 'sec' : '') + '" type="button" data-set="' + esc(s) + '"' + (s === 'Cancelled' ? ' style="color:#e03442"' : '') + '>' + (s === 'Out for delivery' ? 'Send out' : s === 'Cancelled' ? 'Cancel order' : 'Mark ' + s.toLowerCase()) + '</button>'; }).join('') + '</div><div id="st-confirm"></div><p class="sub" id="st-msg" style="min-height:1.2em;margin-top:8px">' + (S.stMsg && S.stMsg.id === id ? esc(S.stMsg.text) : '') + '</p></div>';
+    h += '<div class="box"><h4>Move this order</h4>' + (o.loc && isFinite(o.loc.lat) ? '<p class="lp-now">Shown on the customer\'s map: <b>' + esc(o.loc.label || 'Pinned location') + '</b>' + (o.loc.at ? ' · ' + K.fmtDT(o.loc.at) : '') + '</p>' : '') + '<div class="acts" id="st-acts">' + K.STATUS.filter(function (s) { return s !== o.status; }).map(function (s) { return '<button class="btn sm ' + (s === 'Cancelled' ? 'sec' : '') + '" type="button" data-set="' + esc(s) + '"' + (s === 'Cancelled' ? ' style="color:#e03442"' : '') + '>' + (s === 'Out for delivery' ? 'Send out' : s === 'Cancelled' ? 'Cancel order' : 'Mark ' + s.toLowerCase()) + '</button>'; }).join('') + (K.active(o) ? '<button class="btn sm sec" type="button" data-loc="1">Update location</button>' : '') + '</div><div id="st-confirm"></div><p class="sub" id="st-msg" style="min-height:1.2em;margin-top:8px">' + (S.stMsg && S.stMsg.id === id ? esc(S.stMsg.text) : '') + '</p></div>';
     h += '<div class="box"><h4>Customer</h4><div class="kv"><span>Name</span><span><b>' + esc(o.name) + '</b></span><span>Email</span><span><a href="mailto:' + esc(o.email) + '">' + esc(o.email) + '</a></span><span>Phone</span><span><a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a></span><span>Address</span><span>' + esc(o.address) + ', ' + esc(o.city) + ' ' + esc(o.pin) + ' <a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(o.address + ', ' + o.city + ' ' + o.pin) + '" target="_blank" rel="noopener">Map</a></span><span>Delivery</span><span>' + esc(o.ship) + ', arriving ' + esc(o.deliveryDate) + '</span>' + (o.courier ? '<span>Courier</span><span>' + esc(o.courier) + '</span>' : '') + '</div></div>';
     var items = FL.filter(function (f) { return o.drinks[f.id]; });
     h += '<div class="box"><h4>Items · ' + K.bottles(o) + ' bottles</h4>' + (items.length ? items.map(function (f) { return '<div class="itm"><i class="dot" style="background:' + f.c + '"></i>' + esc(f.name) + '<b>× ' + o.drinks[f.id] + '</b></div>'; }).join('') : '') + '<p class="sub" style="margin-top:8px">' + esc(o.items) + '</p></div>';
     h += '<div class="box"><h4>Money</h4><div class="money"><div><span>Subtotal</span><b class="num">' + inr(o.subtotal) + '</b></div>' + (o.discount ? '<div><span>Subscription savings</span><b class="num">-' + inr(o.discount) + '</b></div>' : '') + '<div><span>' + esc(o.ship) + ' delivery</span><b class="num">' + (o.shipFee ? inr(o.shipFee) : 'Free') + '</b></div><div class="t"><span>Total</span><b>' + inr(o.total) + '</b></div><div><span>Payment</span><span class="tag2 ' + (o.pay === 'Paid' ? 'ok' : 'warn') + '">' + esc(o.pay) + (o.payId ? ' · ' + esc(o.payId) : '') + '</span></div></div></div>';
     h += '<div class="box"><h4>System</h4><div class="kv"><span>Placed</span><span>' + K.fmtDT(o.placedAt) + '</span><span>Email</span><span>' + esc(o.emailSent || '-') + '</span><span>SMS</span><span>' + esc(o.smsSent || '-') + '</span><span>Stock sheet</span><span>' + esc(o.stockUpd || '-') + '</span></div></div></div>';
     dr.innerHTML = h; dr.classList.add('on'); $('#veil').classList.add('on'); dr.setAttribute('aria-hidden', 'false');
+    if (S.lp && S.lp.id === id) lpPaint(); else S.lp = null;
     if (!keep) dr.scrollTop = 0;
   }
-  function closeDrawer() { S.openId = null; S.openSub = null; $('#drawer').classList.remove('on'); $('#veil').classList.remove('on'); $('#drawer').setAttribute('aria-hidden', 'true'); }
+  function closeDrawer() { S.lp = null; S.openId = null; S.openSub = null; $('#drawer').classList.remove('on'); $('#veil').classList.remove('on'); $('#drawer').setAttribute('aria-hidden', 'true'); }
   function statusOp(id, status, extra) {
     return api('admin_status', Object.assign({ id: id, status: status }, extra || {})).then(function (j) {
       if (j && j.auth === false) { logout(true); return j; }
@@ -744,10 +746,73 @@
     api('admin_status', Object.assign({ id: id, status: status }, extra || {})).then(function (j) {
       if (j && j.auth === false) return logout(true);
       if (!j || !j.ok) { if (msg) msg.textContent = (j && j.error) || 'Could not save. Try again.'; $$('#st-acts button').forEach(function (b) { b.disabled = false; }); return; }
-      S.data.orders.forEach(function (o) { if (o.id === id) { o.status = status; if (status === 'Delivered') o.deliveredAt = Date.now(); } });
-      S.stMsg = { id: id, text: 'Saved. Now ' + status.toLowerCase() + (j.restocked ? '. Stock put back: ' + j.restocked : '') + '.' }; render(false); drawer(id, true);
+      S.data.orders.forEach(function (o) { if (o.id === id) { o.status = status; if (extra && extra.courier) o.courier = extra.courier; if (extra && extra.lat != null) o.loc = locOf(extra); if (status === 'Delivered') o.deliveredAt = Date.now(); } });
+      var mailTxt = status !== 'Out for delivery' ? '' : j.mail === 'sent' ? ' Customer emailed.' : /^failed/i.test(j.mail || '') ? ' The customer email did not send (' + j.mail + ').' : ' The customer email was not sent: the Apps Script needs the latest Code.gs.';
+      S.lp = null; S.stMsg = { id: id, text: 'Saved. Now ' + status.toLowerCase() + (extra && extra.lat != null ? ', at ' + (extra.locLabel || 'the new location') : '') + (j.restocked ? '. Stock put back: ' + j.restocked : '') + '.' + mailTxt }; render(false); drawer(id, true);
       load(true);
     });
+  }
+  function locOf(x) { return { lat: x.lat, lng: x.lng, label: x.locLabel || '', at: Date.now(), src: 'admin' }; }
+  function setLocation(id, extra) {
+    var msg = $('#st-msg'); if (msg) msg.textContent = 'Saving...'; $$('#st-acts button, #lp-save, #lp-back').forEach(function (b) { b.disabled = true; });
+    api('admin_location', Object.assign({ id: id }, extra)).then(function (j) {
+      if (j && j.auth === false) return logout(true);
+      if (!j || !j.ok) { if (msg) msg.textContent = (j && j.error) || 'Could not save. Try again.'; $$('#st-acts button, #lp-save, #lp-back').forEach(function (b) { b.disabled = false; }); return; }
+      S.data.orders.forEach(function (o) { if (o.id === id) o.loc = locOf(extra); });
+      S.lp = null; S.stMsg = { id: id, text: 'Location updated' + (extra.locLabel ? ': ' + extra.locLabel : '') + '. The customer\'s map moves on its next refresh.' }; render(false); drawer(id, true);
+      load(true);
+    });
+  }
+
+  /* ================================================================== location for each step */
+  var LP_TITLE = { 'Placed': 'Mark placed', 'Packed': 'Mark packed', 'Out for delivery': 'Send out', 'Delivered': 'Mark delivered' };
+  var LP_HINT = { 'Placed': 'Where the order is right now. The customer sees it on their live map.', 'Packed': 'Where the packed order is waiting. The customer sees it on their live map.', 'Out for delivery': 'Where the order is as it leaves. The customer sees it on their live map and is emailed that it is out for delivery.', 'Delivered': 'Where the order was handed over.' };
+  function gotCoords(x) { return x && x.lat != null && x.lng != null && x.lat !== '' && x.lng !== '' && isFinite(Number(x.lat)) && isFinite(Number(x.lng)); }
+  function whPoint() { var w = (S.data && S.data.warehouse) || {}; return gotCoords(w) ? { lat: Number(w.lat), lng: Number(w.lng), label: w.name || 'Vitame Warehouse' } : null; }
+  function destPoint(o) { return o && gotCoords(o.dest) ? { lat: Number(o.dest.lat), lng: Number(o.dest.lng), label: 'Delivery address' } : null; }
+  function mapToken() { return (W.PP && W.PP.mapboxToken) || ''; }
+  function geoSearch(q, near) {
+    var tk = mapToken(); if (!tk || q.length < 3) return Promise.resolve([]);
+    var url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q) + '.json?country=in&limit=5&autocomplete=true&access_token=' + encodeURIComponent(tk) + (near ? '&proximity=' + near.lng + ',' + near.lat : '');
+    return fetch(url).then(function (r) { return r.json(); }).then(function (j) { return (j.features || []).filter(function (f) { return f && f.center; }).map(function (f) { return { lat: f.center[1], lng: f.center[0], label: String(f.place_name || f.text || '').slice(0, 80) }; }); }).catch(function () { return []; });
+  }
+  function lpPick(mode) {
+    var s = S.lp, o = (S.data.orders || []).filter(function (x) { return x.id === s.id; })[0], p = null; s.mode = mode;
+    s.err = ''; if (mode === 'pick') { s.lat = null; s.lng = null; s.label = ''; s.q = ''; s.res = []; s.searched = false; }
+    if (mode === 'wh') p = whPoint(); else if (mode === 'dest') p = destPoint(o); else if (mode === 'keep' && o && o.loc) p = null;
+    if (p) { s.lat = p.lat; s.lng = p.lng; s.label = p.label; } else if (mode !== 'pick') { s.lat = null; s.lng = null; if (mode === 'keep') s.label = ''; }
+    if (mode === 'dest' && !p && o) { s.busy = true; lpPaint(); geoSearch([o.address, o.city, o.pin].filter(Boolean).join(', '), whPoint()).then(function (r) { if (!S.lp || S.lp !== s || s.mode !== 'dest') return; s.busy = false; if (r[0]) { s.lat = r[0].lat; s.lng = r[0].lng; s.label = 'Delivery address'; } else s.err = 'Could not find the address on the map. Use Pick a place.'; lpPaint(); }); return; }
+    lpPaint();
+  }
+  function lpOpen(id, status, only) {
+    var o = (S.data.orders || []).filter(function (x) { return x.id === id; })[0]; if (!o) return;
+    S.lp = { id: id, status: status, only: !!only, mode: '', lat: null, lng: null, label: '', q: '', res: [], err: '', busy: false, courier: o.courier || '' };
+    lpPick(only && o.loc ? 'keep' : status === 'Delivered' ? 'dest' : (whPoint() ? 'wh' : 'pick'));
+  }
+  function lpPaint() {
+    var s = S.lp, c = $('#st-confirm'); if (!s || !c) return;
+    var o = (S.data.orders || []).filter(function (x) { return x.id === s.id; })[0] || {}, wh = whPoint(), tk = mapToken();
+    var modes = [['wh', 'Warehouse', !!wh], ['dest', 'Customer address', true], ['pick', 'Pick a place', !!tk]]; if (o.loc && gotCoords(o.loc)) modes.unshift(['keep', 'Keep current', true]);
+    var h = '<div class="box lp"><b>' + esc(s.only ? 'Update location' : LP_TITLE[s.status] || s.status) + ' · ' + esc(s.id) + '</b><p class="sub" style="margin:6px 0 0">' + esc(s.only ? 'Move the order on the customer\'s live map without changing its status.' : LP_HINT[s.status] || '') + '</p>';
+    h += '<div class="chips" role="group" aria-label="Location">' + modes.filter(function (m) { return m[2]; }).map(function (m) { return '<button type="button" data-lpm="' + m[0] + '" aria-pressed="' + (s.mode === m[0]) + '">' + m[1] + '</button>'; }).join('') + '</div>';
+    if (s.mode === 'pick') h += '<div class="fld"><label for="lp-q">Search a place</label><input id="lp-q" type="search" autocomplete="off" placeholder="e.g. Indore sorting hub, Vijay Nagar" value="' + esc(s.q) + '"></div><div class="lp-res" id="lp-res">' + lpResHtml(s) + '</div>';
+    if (s.busy) h += '<p class="sub" style="margin:10px 0 0">Finding the address...</p>';
+    else if (gotCoords(s) && s.mode !== 'keep') h += '<div class="fld"><label for="lp-label">Name shown to the customer</label><input id="lp-label" type="text" maxlength="80" value="' + esc(s.label) + '"></div><p class="sub num" style="margin:6px 0 0">' + Number(s.lat).toFixed(5) + ', ' + Number(s.lng).toFixed(5) + '</p>';
+    else if (s.mode === 'keep') h += '<p class="sub" style="margin:10px 0 0">The map stays at <b>' + esc(o.loc && o.loc.label || 'its current pin') + '</b>.</p>';
+    else if (s.mode !== 'pick') h += '<p class="sub" style="margin:10px 0 0">' + esc(s.mode === 'wh' ? 'The warehouse position is not set yet. Use Pick a place.' : 'The address is not on the map yet. Use Pick a place.') + '</p>';
+    if (s.err) h += '<p class="sub" style="margin:8px 0 0;color:#e03442">' + esc(s.err) + '</p>';
+    if (s.status === 'Out for delivery' && !s.only) h += '<div class="fld"><label for="lp-courier">Courier name (optional)</label><input id="lp-courier" type="text" maxlength="40" value="' + esc(s.courier) + '"></div>';
+    var go = s.only ? 'Update location' : LP_TITLE[s.status] || 'Save';
+    h += '<div class="acts" style="margin-top:12px"><button class="btn sm" type="button" id="lp-save"' + (s.busy || (s.only && !gotCoords(s)) ? ' disabled' : '') + '>' + esc(go) + '</button><button class="btn sm sec" type="button" id="lp-back">Back</button></div></div>';
+    c.innerHTML = h;
+  }
+  function lpResHtml(s) { return (s.res || []).map(function (r, i) { return '<button type="button" data-lpr="' + i + '">' + esc(r.label) + '</button>'; }).join('') || (s.q.length >= 3 && s.searched ? '<p class="sub" style="margin:0">No match. Try a nearby landmark or area.</p>' : ''); }
+  function lpSave() {
+    var s = S.lp; if (!s) return; var extra = {};
+    if (s.status === 'Out for delivery' && !s.only) { var cn = $('#lp-courier'); if (cn && cn.value.trim()) extra.courier = cn.value.trim(); }
+    if (s.mode !== 'keep' && gotCoords(s)) { extra.lat = Math.round(Number(s.lat) * 1e6) / 1e6; extra.lng = Math.round(Number(s.lng) * 1e6) / 1e6; extra.locLabel = String(s.label || '').trim().slice(0, 80); }
+    if (s.only) { if (extra.lat == null) { s.err = 'Choose a location first.'; return lpPaint(); } return setLocation(s.id, extra); }
+    return setStatus(s.id, s.status, extra);
   }
 
   /* ================================================================== render + events */
@@ -805,10 +870,13 @@
       if ((b = t.closest('[data-set]'))) {
         var st = b.dataset.set, id = S.openId, c = $('#st-confirm');
         if (st === 'Cancelled') { c.innerHTML = '<div class="box" style="margin-top:12px;background:#fff4de"><b>Cancel ' + esc(id) + '?</b><label style="display:flex;gap:8px;align-items:center;margin:10px 0;font-size:.86rem"><input type="checkbox" id="rs" checked> Put the bottles back in stock</label><div class="acts"><button class="btn sm" type="button" id="cy" style="background:#e03442;color:#fff">Yes, cancel</button><button class="btn sm sec" type="button" id="cn">Keep it</button></div></div>'; return; }
-        if (st === 'Delivered') { c.innerHTML = ''; }
-        var courier = ''; if (st === 'Out for delivery') { courier = (W.prompt ? W.prompt('Courier name (optional)', '') : '') || ''; }
-        return setStatus(id, st, courier ? { courier: courier } : {});
+        return lpOpen(id, st, false);
       }
+      if ((b = t.closest('[data-loc]'))) { var oo = (S.data.orders || []).filter(function (x) { return x.id === S.openId; })[0]; return oo && lpOpen(oo.id, oo.status, true); }
+      if ((b = t.closest('[data-lpm]'))) return lpPick(b.dataset.lpm);
+      if ((b = t.closest('[data-lpr]'))) { var rr = S.lp && S.lp.res[Number(b.dataset.lpr)]; if (rr) { S.lp.lat = rr.lat; S.lp.lng = rr.lng; S.lp.label = rr.label; S.lp.err = ''; lpPaint(); } return; }
+      if (t.id === 'lp-save') return lpSave();
+      if (t.id === 'lp-back') { S.lp = null; $('#st-confirm').innerHTML = ''; return; }
       if (t.id === 'cy') return setStatus(S.openId, 'Cancelled', { restock: !!($('#rs') && $('#rs').checked) });
       if (t.id === 'cn') { $('#st-confirm').innerHTML = ''; return; }
       if (t.id === 'csv') return csvOut();
@@ -827,6 +895,12 @@
     D.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); if ((e.key === 'Enter') && e.target.matches && e.target.matches('tr[data-open]')) drawer(e.target.dataset.open); });
     D.addEventListener('input', function (e) {
       var t = e.target; if (t.id === 'sf-q') { (S.sf = S.sf || { q: '', status: '' }).q = t.value; S.anim = false; render(); } else if (t.id === 'f-q') { S.f.q = t.value; S.page = 1; S.anim = false; render(); } else if (t.id === 'c-q') { S.cq = t.value; S.anim = false; render(); }
+    });
+    var lpTimer = null;
+    D.addEventListener('input', function (e) {
+      var t = e.target; if (!S.lp) return;
+      if (t.id === 'lp-label') S.lp.label = t.value; else if (t.id === 'lp-courier') S.lp.courier = t.value;
+      else if (t.id === 'lp-q') { var s = S.lp; s.q = t.value.trim(); s.searched = false; clearTimeout(lpTimer); if (s.q.length < 3) { s.res = []; $('#lp-res').innerHTML = ''; return; } lpTimer = setTimeout(function () { geoSearch(s.q, whPoint()).then(function (r) { if (S.lp !== s || s.mode !== 'pick') return; s.res = r; s.searched = true; var box = $('#lp-res'); if (box) box.innerHTML = lpResHtml(s); }); }, 350); }
     });
     D.addEventListener('change', function (e) {
       var t = e.target, map = { 'f-status': 'status', 'f-ship': 'ship', 'f-pay': 'pay', 'f-sort': 'sort' };
