@@ -11,5 +11,10 @@ const map = { ORDERS_ENDPOINT: "ordersEndpoint", ADMIN_EMAIL: "adminEmail", GOOG
 Object.keys(map).forEach((k) => { if (e[k] && e[k].trim()) cfg[map[k]] = e[k].trim(); });
 cfg.firebase = cfg.firebase || {};
 [["FIREBASE_API_KEY", "apiKey"], ["FIREBASE_AUTH_DOMAIN", "authDomain"], ["FIREBASE_PROJECT_ID", "projectId"]].forEach((p) => { if (e[p[0]] && e[p[0]].trim()) cfg.firebase[p[1]] = e[p[0]].trim(); });
+cfg.pay = cfg.pay || {};
+[["PAYMENT_MODE", "mode"], ["UPI_ID", "upiId"], ["UPI_PAYEE", "payee"]].forEach((p) => { if (e[p[0]] && e[p[0]].trim()) cfg.pay[p[1]] = e[p[0]].trim(); });
+if (cfg.pay.mode !== "live") cfg.pay.mode = "demo";
+if (Number(e.EMI_MIN) > 0) cfg.pay.emiMin = Number(e.EMI_MIN);
 fs.writeFileSync(path, "/* Generated at deploy time from environment variables. */\nwindow.PP = " + JSON.stringify(cfg, null, 2) + ";\n");
+console.log("Payments:", cfg.pay.mode, cfg.pay.upiId ? "| UPI id set" : "| no UPI id");
 console.log("config.js written. Google sign-in:", cfg.googleClientId ? "on" : "off", "| Firebase:", cfg.firebase.apiKey ? "on" : "off", "| map token:", cfg.mapboxToken ? "set" : "missing");

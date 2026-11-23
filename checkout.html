@@ -103,6 +103,7 @@
 
   <script src="./assets/config.js"></script>
   <link rel="stylesheet" href="./assets/pip.css">
+  <link rel="stylesheet" href="./assets/pay.css">
   <script src="./assets/pip.js" defer></script>
 </head>
 <body>
@@ -179,6 +180,8 @@
     </div>
   </main>
 
+  <script src="./assets/vendor/qrcode.min.js"></script>
+  <script src="./assets/pay.js"></script>
   <script>
   (function(){
     // ===== Razorpay config. Paste your Razorpay Key ID (rzp_test_... or rzp_live_...) here. It is a public key. =====
@@ -254,9 +257,10 @@
 
     // ----- pay
     var btn=$('[data-pay]'),msg=$('[data-msg]');
-    var LABEL=RAZORPAY_KEY_ID?'Pay securely':'Place order';
+    var VP=window.VitamePay; // the built-in payment window (assets/pay.js), used when there is no Razorpay key
+    var LABEL=(RAZORPAY_KEY_ID||VP)?'Pay securely':'Place order';
     btn.textContent=LABEL;
-    if(!RAZORPAY_KEY_ID)$('.secure').textContent='Online payment is being set up. Your order is saved now and we will confirm payment with you.';
+    if(!RAZORPAY_KEY_ID)$('.secure').textContent=VP?VP.note():'Online payment is being set up. Your order is saved now and we will confirm payment with you.';
 
     // ----- order storage (Google Sheet via Apps Script). Orders that fail to send are kept and retried.
     function post(payload){
@@ -286,13 +290,14 @@
         subtotal:full,discount:saved,shipFee:fee(),total:total(),payStatus:status,paymentId:payId||'',website:'',
         items:cart.map(function(i){return {name:i.name,detail:i.detail||'',qty:i.qty,flavour:i.flavour||'',mix:i.mix||null,sub:!!i.sub,freq:i.sub?(i.freq||'fortnight'):''}})};
     }
-    function success(resp,d,status,res){
-      var order={id:(res&&res.orderId)||('LOCAL-'+Date.now().toString(36).toUpperCase()),token:(res&&res.token)||'',payId:resp.razorpay_payment_id||'',total:total(),paid:total(),pay:status,status:status,ship:shipVal(),date:fmt.format(dates[shipVal()]),to:d,items:cart,at:Date.now(),subtotal:full,discount:saved,shipFee:fee()};
+    function success(resp,d,status,res,pr){
+      var order={id:(res&&res.orderId)||('LOCAL-'+Date.now().toString(36).toUpperCase()),token:(res&&res.token)||'',payId:(pr&&pr.method==='cod')?'':(resp.razorpay_payment_id||''),total:total(),paid:total(),pay:status,status:status,ship:shipVal(),date:fmt.format(dates[shipVal()]),to:d,items:cart,at:Date.now(),subtotal:full,discount:saved,shipFee:fee()};
       try{var all=JSON.parse(localStorage.getItem('pp-orders')||'[]');all.push(order);localStorage.setItem('pp-orders',JSON.stringify(all));localStorage.setItem('pp-profile',JSON.stringify(d));localStorage.removeItem('pp-cart')}catch(e){}
       main.hidden=true;$('[data-lede]').hidden=true;$('[data-done]').hidden=false;
       $('[data-done-h]').textContent=status==='Paid'?'Order placed':'Order received';
-      $('[data-done-msg]').textContent='Thank you, '+d.name.split(' ')[0]+'. '+(status==='Paid'?'Your payment went through and your order is confirmed.':'We have your order and will confirm payment with you.')+(ORDERS_ENDPOINT?' A confirmation is on its way to your email and phone.':'');
-      $('[data-done-dl]').innerHTML=(res&&res.orderId?'<div><dt>Order number</dt><dd>'+esc(order.id)+'</dd></div>':'')+(order.payId?'<div><dt>Payment ID</dt><dd>'+esc(order.payId)+'</dd></div>':'')+'<div><dt>'+(status==='Paid'?'Amount paid':'Amount due')+'</dt><dd>'+money(order.paid)+'</dd></div><div><dt>Delivery</dt><dd>'+(order.ship==='premium'?'Premium':'Normal')+'</dd></div><div><dt>Arriving</dt><dd>'+order.date+'</dd></div><div><dt>Delivering to</dt><dd>'+esc(d.address+', '+d.city+' '+d.pin)+'</dd></div>';
+      var pend=!pr?'We have your order and will confirm payment with you.':pr.method==='cod'?'Your order is placed. Pay the courier when it arrives.':pr.demo?'That was a test payment, so no money was charged. We will confirm payment with you.':'We have your UPI reference and will confirm your payment shortly.';
+      $('[data-done-msg]').textContent='Thank you, '+d.name.split(' ')[0]+'. '+(status==='Paid'?'Your payment went through and your order is confirmed.':pend)+(ORDERS_ENDPOINT?' A confirmation is on its way to your email and phone.':'');
+      $('[data-done-dl]').innerHTML=(res&&res.orderId?'<div><dt>Order number</dt><dd>'+esc(order.id)+'</dd></div>':'')+(order.payId?'<div><dt>'+(pr?'Payment reference':'Payment ID')+'</dt><dd>'+esc(order.payId)+'</dd></div>':'')+'<div><dt>'+(status==='Paid'?'Amount paid':(pr&&pr.method==='upi'&&!pr.demo)?'Amount (confirming)':'Amount due')+'</dt><dd>'+money(order.paid)+'</dd></div><div><dt>Delivery</dt><dd>'+(order.ship==='premium'?'Premium':'Normal')+'</dd></div><div><dt>Arriving</dt><dd>'+order.date+'</dd></div><div><dt>Delivering to</dt><dd>'+esc(d.address+', '+d.city+' '+d.pin)+'</dd></div>';
       var tl=$('[data-track-link]');if(order.token)tl.href='./orders.html#'+order.id;
       if(res&&res.subs&&res.subs.length){
         try{var ss=JSON.parse(localStorage.getItem('pp-subs')||'[]');res.subs.forEach(function(x){if(!ss.some(function(y){return y.id===x.id}))ss.push(x)});localStorage.setItem('pp-subs',JSON.stringify(ss))}catch(e){}
@@ -308,6 +313,22 @@
       if(window.ppStock&&window.ppStock.block(cartIds()))return; // a drink in the box sold out
       var d=details();
       var fail=function(t){btn.disabled=false;btn.textContent=LABEL;say(t)};
+      if(!RAZORPAY_KEY_ID&&VP){
+        btn.disabled=true;btn.textContent='Opening payment...';
+        var placed=null;
+        VP.open({
+          amount:total(),ref:'VIT'+Date.now().toString(36).toUpperCase().slice(-6),customer:{name:d.name,email:d.email,phone:d.phone},
+          onSuccess:function(r){ // saved as Pending: the shop confirms the money (UPI reference) or collects it (cash on delivery)
+            if(placed)return {ok:true};
+            return submitOrder(payload(d,'Pending',r.paymentId)).then(function(res){if(!res.ok)return {ok:false,error:res.error||'Could not place the order. Please try again.'};placed=res;return {ok:true}});
+          },
+          onClose:function(c){
+            if(c.completed&&placed)return success({razorpay_payment_id:c.result.paymentId},d,'Pending',placed,c.result);
+            btn.disabled=false;btn.textContent=LABEL;say('Payment cancelled. Your box is saved.');btn.focus();
+          }
+        });
+        return;
+      }
       if(!RAZORPAY_KEY_ID){
         btn.disabled=true;btn.textContent='Placing order...';
         submitOrder(payload(d,'Pending','')).then(function(res){if(!res.ok)return fail(res.error||'Could not place the order. Please try again.');success({},d,'Pending',res)});
