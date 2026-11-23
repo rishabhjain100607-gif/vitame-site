@@ -76,7 +76,8 @@
 
   /* ---------------------------------------------------------------- window */
   var S = null;
-  function available() { return !!UPI_ID; }
+  // Off unless window.PP.pay.autopay === true: UPI AutoPay links are refused for a personal UPI ID, so it needs a payment partner first.
+  function available() { return !!UPI_ID && P.autopay === true; }
 
   function open(o) {
     if (S) return;
