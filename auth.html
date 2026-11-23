@@ -234,7 +234,8 @@
         fail(f,'Google sign-in is not set up yet. Add your Google Client ID to enable it.')};
     }
     var boxes=document.querySelectorAll('[data-google]');
-    if(!GOOGLE_CLIENT_ID){boxes.forEach(fallbackBtn)}
+    if(!GOOGLE_CLIENT_ID){ // not set up: hide the button and the "or" line rather than show a button that cannot work
+      boxes.forEach(function(b){b.hidden=true});document.querySelectorAll('.or').forEach(function(x){x.hidden=true})}
     else{
       var sc=document.createElement('script');sc.src='https://accounts.google.com/gsi/client';sc.async=true;
       sc.onload=function(){
