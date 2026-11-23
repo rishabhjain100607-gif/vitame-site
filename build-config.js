@@ -9,5 +9,7 @@ try { cfg = new Function("return " + m[1])(); } catch (e) { cfg = {}; }
 const e = process.env;
 const map = { ORDERS_ENDPOINT: "ordersEndpoint", ADMIN_EMAIL: "adminEmail", GOOGLE_CLIENT_ID: "googleClientId", MAPBOX_TOKEN: "mapboxToken", MAPBOX_STYLE: "mapStyle" };
 Object.keys(map).forEach((k) => { if (e[k] && e[k].trim()) cfg[map[k]] = e[k].trim(); });
+cfg.firebase = cfg.firebase || {};
+[["FIREBASE_API_KEY", "apiKey"], ["FIREBASE_AUTH_DOMAIN", "authDomain"], ["FIREBASE_PROJECT_ID", "projectId"]].forEach((p) => { if (e[p[0]] && e[p[0]].trim()) cfg.firebase[p[1]] = e[p[0]].trim(); });
 fs.writeFileSync(path, "/* Generated at deploy time from environment variables. */\nwindow.PP = " + JSON.stringify(cfg, null, 2) + ";\n");
-console.log("config.js written. Google sign-in:", cfg.googleClientId ? "on" : "off", "| map token:", cfg.mapboxToken ? "set" : "missing");
+console.log("config.js written. Google sign-in:", cfg.googleClientId ? "on" : "off", "| Firebase:", cfg.firebase.apiKey ? "on" : "off", "| map token:", cfg.mapboxToken ? "set" : "missing");
